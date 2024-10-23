@@ -1,0 +1,19 @@
+@media (max-width: 768px) {
+  .terminal-container {
+    padding: 10px;
+  }
+
+  .terminal-header h2 {
+    font-size: 18px;
+  }
+
+  .terminal-scroll-area,
+  .terminal-input {
+    font-size: 12px;
+  }
+
+  .stop-button {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}

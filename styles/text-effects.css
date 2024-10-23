@@ -1,0 +1,66 @@
+.crt-text-shadow {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-emphasis);
+}
+
+.crt-text-shadow-primary {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary);
+}
+
+.crt-text-shadow-secondary {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-primary), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-secondary);
+}
+
+.crt-text-shadow-emphasis {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-primary), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-emphasis);
+}
+
+@keyframes textFlicker {
+  0%, 100% { opacity: var(--crt-flicker-opacity); }
+  50% { opacity: 1; }
+}
+
+.crt-text-flicker {
+  animation: textFlicker var(--crt-flicker-duration) infinite;
+}
+
+.crt-phosphor .eight-bit-text,
+.crt-phosphor .eight-bit-subtitle,
+.crt-phosphor .eight-bit-title,
+.crt-phosphor .eight-bit-link {
+  filter: drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-shadow.crt-phosphor .eight-bit-text,
+.crt-text-shadow.crt-phosphor .eight-bit-subtitle,
+.crt-text-shadow.crt-phosphor .eight-bit-title,
+.crt-text-shadow.crt-phosphor .eight-bit-link {
+  text-shadow: 
+    var(--crt-shadow-offset-y) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary),
+    0 0 var(--crt-phosphor-blur) currentColor;
+  filter: none;
+}
+
+.crt-icon {
+  fill: currentColor;
+  filter: drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-shadow .crt-icon {
+  filter: 
+    drop-shadow(var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-secondary))
+    drop-shadow(calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary))
+    drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-flicker .crt-icon {
+  animation: textFlicker var(--crt-flicker-duration) infinite;
+}

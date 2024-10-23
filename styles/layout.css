@@ -1,0 +1,59 @@
+.eight-bit-layout {
+  max-width: 900px;
+  margin: 10px auto 0;
+  border: var(--border-width) solid var(--color-text);
+  padding: 30px;
+  box-shadow: 0 0 5px var(--color-text), 0 0 10px var(--color-text);
+  background-color: rgba(10, 10, 10, 0.8);
+  position: relative;
+  z-index: 1;
+}
+
+.eight-bit-header {
+  border-bottom: var(--border-width) solid var(--color-text);
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+.eight-bit-title {
+  font-size: 40px;
+  color: var(--color-emphasis);
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 4px 4px 0 var(--color-secondary);
+}
+
+.eight-bit-nav {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.eight-bit-main {
+  margin-bottom: 30px;
+}
+
+.eight-bit-section {
+  border: var(--border-width) solid var(--color-primary);
+  padding: 30px;
+  margin-bottom: 30px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.eight-bit-subtitle {
+  font-size: 32px;
+  color: var(--color-emphasis);
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 0 var(--color-secondary);
+}
+
+.eight-bit-text {
+  font-size: 18px;
+}
+
+.eight-bit-footer {
+  border-top: var(--border-width) solid var(--color-text);
+  padding-top: 30px;
+  text-align: center;
+}

@@ -1,0 +1,100 @@
+/* Eight-bit link styles */
+.eight-bit-link {
+  color: var(--color-secondary);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.eight-bit-link::before {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-secondary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.eight-bit-link:hover {
+  text-decoration: none;
+  color: var(--color-emphasis);
+}
+
+.eight-bit-link:hover::before {
+  transform: scaleX(1);
+}
+
+/* EightBit Button Styles */
+.eight-bit-button {
+  background-color: var(--color-bg);
+  color: var(--color-secondary);
+  border: var(--border-width) solid var(--color-secondary);
+  padding: 15px 25px;
+  font-family: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 var(--color-emphasis);
+}
+
+.eight-bit-button:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-bg);
+  box-shadow: 0 0 15px var(--color-secondary);
+}
+
+/* EightBit Dropdown Styles */
+.eb-dropdown-wrapper {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1010;
+}
+
+.eb-dropdown-button {
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 70px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eb-dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--color-bg);
+  border: 3px solid var(--color-text);
+  padding: 10px 0;
+  width: 320px;
+  font-size: 14px;
+  z-index: 1011;
+}
+
+.eb-dropdown-content > * {
+  display: block;
+  width: 290px;
+  padding: 8px 15px;
+  color: var(--color-text);
+  transition: all 0.3s ease;
+  text-align: left;
+  background: var(--color-bg);
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eb-dropdown-content > *:hover {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
