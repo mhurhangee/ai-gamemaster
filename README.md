@@ -4,24 +4,25 @@ An innovative, LLM-powered text-based RPG experience using Next.js, TypeScript, 
 
 ## Project Overview
 
-AI Dungeon Master is a dynamic, text-based RPG that leverages the power of Large Language Models (LLMs) to create a unique and adaptive gaming experience. Unlike traditional RPGs with fixed rules and predefined character types, this game allows for open-ended character creation, flexible party composition, and a fluid approach to game mechanics like health, experience, and equipment.
+AI Dungeon Master is a dynamic, text-based RPG that leverages the power of Large Language Models (LLMs) to create a unique and adaptive gaming experience. It allows for open-ended character creation, flexible party composition, and a fluid approach to game mechanics, all while providing a structured way to start, save, and load games. The game maintains internal consistency through a Game Lore Keeper system.
 
 Key Features:
-
 - LLM-controlled game logic and storytelling
 - Open-ended character and party creation
-- Adaptive game mechanics
+- Adaptive game mechanics (health, XP, equipment, etc.)
+- Game Lore Keeper for maintaining consistent rules and world logic
 - 8-bit style terminal interface
 - Save/Load functionality using unique codes
-
+- Out-of-character communication with the game master
 
 ## Project Structure
 
-```plaintext
+```
+
 ai-dungeon-master/
 ├── app/
 │   ├── api/
-│   │   ├── game-action/
+│   │   ├── chat/
 │   │   │   └── route.ts
 │   │   ├── save-game/
 │   │   │   └── route.ts
@@ -30,247 +31,181 @@ ai-dungeon-master/
 │   ├── page.tsx
 │   └── layout.tsx
 ├── components/
-│   └── Terminal.tsx
+│   ├── terminal/
+│   │   ├── TerminalContainer.tsx
+│   │   ├── TerminalContent.tsx
+│   │   ├── TerminalHeader.tsx
+│   │   ├── TerminalInput.tsx
+│   │   ├── TerminalMessages.tsx
+│   │   └── TerminalCommands.tsx
+│   └── GameInitializer.tsx
+├── contexts/
+│   └── TerminalContext.tsx
 ├── lib/
 │   ├── game-engine.ts
+│   ├── game-initializer.ts
 │   ├── story-generator.ts
 │   ├── party-manager.ts
 │   ├── world-state-manager.ts
-│   ├── content-moderation.ts
-│   └── openai-client.ts
+│   ├── game-lore-keeper.ts
+│   ├── save-load-manager.ts
+│   └── content-moderation.ts
 ├── types/
 │   ├── game-state.ts
-│   └── party.ts
+│   ├── party.ts
+│   └── game-lore.ts
 ├── utils/
-│   └── sequential-generation.ts
-├── .env.local
-├── next.config.js
-├── package.json
-└── tsconfig.json
-```
+│   ├── sequential-generation.ts
+│   └── unique-code-generator.ts
+
+```plaintext
 
 ## Key Components
 
-### 1. Terminal Interface (`components/Terminal.tsx`)
+1. Terminal Interface (`components/terminal/`)
+   - Provides the main user interface for the game
+   - Utilizes existing components: TerminalContainer, TerminalContent, TerminalHeader, TerminalInput, TerminalMessages
 
-The existing terminal component serves as the main user interface. It handles rendering of game text and user input.
+2. GameInitializer (`components/GameInitializer.tsx`)
+   - Handles the process of starting a new game or loading an existing one
+   - Prompts the user for initial world, party, and story details
+   - Allows setting of initial game rules and lore
 
-### 2. Game Engine (`lib/game-engine.ts`)
+3. TerminalContext (`contexts/TerminalContext.tsx`)
+   - Manages game state and user interactions using React's Context API
+   - Integrates with the `useChat` hook for handling AI responses
 
-The core of the game logic. It processes user actions, updates the game state, and coordinates with other components.
+4. API Routes
+   - `app/api/chat/route.ts`: Handles all in-game actions and AI responses
+   - `app/api/save-game/route.ts`: Manages game state saving
+   - `app/api/load-game/route.ts`: Handles game state loading
 
-```typescript
-// lib/game-engine.ts
-import { generateStoryEvent } from './story-generator';
-import { updateParty } from './party-manager';
-import { updateWorldState } from './world-state-manager';
-import { isContentAppropriate } from './content-moderation';
+5. Game Engine (`lib/game-engine.ts`)
+   - Processes user actions and updates game state
+   - Coordinates with other components like story generator, party manager, and Game Lore Keeper
+   - Handles out-of-character communication with the game master
 
-export async function processGameAction(action: string, gameState: GameState): Promise<GameState> {
-  if (!(await isContentAppropriate(action))) {
-    return { ...gameState, error: "Inappropriate content detected." };
-  }
+6. Game Initializer (`lib/game-initializer.ts`)
+   - Coordinates the process of starting a new game or loading an existing one
+   - Primes the story, party, and world generation processes
+   - Initializes the Game Lore Keeper with user-defined rules
 
-  const updatedParty = await updateParty(gameState.party, action);
-  const updatedWorld = await updateWorldState(gameState.world, action);
-  const storyEvent = await generateStoryEvent(updatedParty, updatedWorld);
+7. Story Generator (`lib/story-generator.ts`)
+   - Generates narrative content based on the current game state and player actions
+   - Utilizes sequential generation to maintain coherence
+   - Consults the Game Lore Keeper to ensure consistency with established rules
 
-  return {
-    ...gameState,
-    party: updatedParty,
-    world: updatedWorld,
-    storyEvents: [...gameState.storyEvents, storyEvent],
-  };
-}
-```
+8. Party Manager (`lib/party-manager.ts`)
+   - Manages the player's party, including character creation and development
+   - Interprets LLM responses to update character stats and inventories
+   - Adheres to rules established in the Game Lore Keeper
 
-### 3. Story Generator (`lib/story-generator.ts`)
+9. World State Manager (`lib/world-state-manager.ts`)
+   - Maintains and updates the game world state based on player actions and time passage
+   - Ensures consistency with the Game Lore Keeper
 
-Generates narrative content based on the current game state and player actions.
+10. Game Lore Keeper (`lib/game-lore-keeper.ts`)
+    - Maintains a repository of game rules, mechanics, and world logic
+    - Allows for the addition and modification of rules during gameplay
+    - Provides a reference for other components to ensure consistency
+    - Saves and loads rule sets along with game states
 
-```typescript
-// lib/story-generator.ts
-import { openai } from './openai-client';
-import { sequentialGeneration } from '../utils/sequential-generation';
+11. Save/Load Manager (`lib/save-load-manager.ts`)
+    - Handles saving and loading game states, including Game Lore Keeper rules
+    - Manages unique code generation and Redis interactions
 
-export async function generateStoryEvent(party: Party, world: WorldState): Promise<string> {
-  const prompt = `Given the current party state: ${JSON.stringify(party)} and world state: ${JSON.stringify(world)}, generate the next story event.`;
-  
-  return await sequentialGeneration(prompt, (prevContent) => {
-    return openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a creative storyteller for an 8-bit style RPG.' },
-        { role: 'user', content: prevContent },
-      ],
-    });
-  });
-}
-```
+12. Content Moderation (`lib/content-moderation.ts`)
+    - Implements safeguards to prevent inappropriate content or off-topic conversations
 
-### 4. Party Manager (`lib/party-manager.ts`)
+## How It Works
 
-Manages the player's party, including character creation, progression, and equipment.
+1. Game Initialization:
+   - Players start by either creating a new game or loading an existing one through the GameInitializer component.
+   - For new games, the LLM prompts the user for initial world, party, and story details, as well as any specific game rules.
+   - The Game Lore Keeper is initialized with these rules.
+   - For loaded games, the save state and rule set are retrieved from Redis and a recap is generated.
 
-```typescript
-// lib/party-manager.ts
-import { openai } from './openai-client';
-import { Party, Character } from '../types/party';
+2. User Interaction:
+   - Players interact with the game through the terminal interface.
+   - All inputs are processed through the `useChat` hook in TerminalContext.
 
-export async function createCharacter(description: string): Promise<Character> {
-  const response = await openai.createChatCompletion({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'You are a character creator for an 8-bit style RPG.' },
-      { role: 'user', content: `Create a character based on this description: "${description}"` },
-    ],
-  });
+3. Action Processing:
+   - User actions are sent to the API route (`/api/chat/route.ts`).
+   - The API route processes the action, updating the game state and generating a response using the LLM.
+   - The Game Lore Keeper is consulted to ensure actions and outcomes align with established rules.
+   - Out-of-character communications are handled separately by the game engine.
 
-  return JSON.parse(response.data.choices[0].message?.content || '{}');
-}
+4. LLM Integration:
+   - The LLM interprets user actions, manages game state, and generates narrative responses.
+   - Sequential generation is used to maintain coherence and prevent off-topic responses.
+   - The LLM references the Game Lore Keeper to maintain consistency with established rules and world logic.
 
-export async function updateParty(party: Party, action: string): Promise<Party> {
-  const response = await openai.createChatCompletion({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'You are managing a party in an 8-bit style RPG.' },
-      { role: 'user', content: `Update the party based on this action: "${action}". Current party: ${JSON.stringify(party)}` },
-    ],
-  });
+5. State Management:
+   - Game state is managed through the TerminalContext, which is updated based on LLM responses.
+   - The Game Lore Keeper's rule set is part of the game state and is updated as needed.
 
-  return JSON.parse(response.data.choices[0].message?.content || '{}');
-}
-```
+6. Rule Evolution:
+   - As the game progresses, new rules may be established or existing ones modified.
+   - These changes are recorded in the Game Lore Keeper and applied to future interactions.
 
-### 5. World State Manager (`lib/world-state-manager.ts`)
+7. Saving and Loading:
+   - Games can be saved at any point, generating a unique code for the user.
+   - Saved games, including the current rule set from the Game Lore Keeper, are stored in Redis with an expiration date.
+   - Games can be loaded using the unique code, retrieving the state and rule set from Redis.
+   - Local storage is used for frequent client-side saves, syncing with Redis periodically.
 
-Maintains and updates the game world state based on player actions and time passage.
+8. Rendering:
+   - The terminal components render the updated game state and AI responses to the user.
 
-```typescript
-// lib/world-state-manager.ts
-import { openai } from './openai-client';
-import { WorldState } from '../types/game-state';
+## Key Concepts
 
-export async function updateWorldState(world: WorldState, action: string): Promise<WorldState> {
-  const response = await openai.createChatCompletion({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'You are managing the world state in an 8-bit style RPG.' },
-      { role: 'user', content: `Update the world based on this action: "${action}". Current world state: ${JSON.stringify(world)}` },
-    ],
-  });
+1. LLM-Controlled Gameplay:
+   - The LLM interprets and manages all aspects of the game, including character creation, stats, and narrative progression.
+   - This allows for a highly flexible and adaptive gaming experience.
 
-  return JSON.parse(response.data.choices[0].message?.content || '{}');
-}
-```
+2. Open-ended Character and Party System:
+   - Players can describe their characters in natural language.
+   - Parties can consist of any number or type of characters.
 
-### 6. Content Moderation (`lib/content-moderation.ts`)
+3. Adaptive Game Mechanics:
+   - Instead of fixed rules for health, experience, or equipment, the LLM interprets the game state and player actions to determine outcomes.
+   - The Game Lore Keeper ensures consistency in how these mechanics are applied.
 
-Implements safeguards to prevent inappropriate content or off-topic conversations.
+4. Dynamic Storytelling:
+   - The story evolves based on player actions and the current game state, creating a unique experience for each playthrough.
+   - The Game Lore Keeper helps maintain internal consistency in the narrative and world logic.
 
-```typescript
-// lib/content-moderation.ts
-import { openai } from './openai-client';
+5. Safeguards and Coherence:
+   - Content moderation and sequential generation techniques are used to maintain appropriate content and narrative coherence.
+   - The Game Lore Keeper acts as an additional safeguard against inconsistencies.
 
-export async function isContentAppropriate(content: string): Promise<boolean> {
-  const response = await openai.createChatCompletion({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'You are a content moderator for an 8-bit style RPG.' },
-      { role: 'user', content: `Is this content appropriate: "${content}"? Respond with true or false.` },
-    ],
-  });
+6. Persistent Gameplay:
+   - Save/Load functionality allows players to continue their adventures across multiple sessions.
+   - Unique codes provide a simple way to manage saves without requiring user accounts.
+   - The Game Lore Keeper's rule set is saved and loaded along with the game state.
 
-  return response.data.choices[0].message?.content?.toLowerCase() === 'true';
-}
-```
+7. Out-of-Character Communication:
+   - Players can communicate with the game master out of character to address issues or ask for clarifications.
+   - This can include discussions about game rules, which may lead to updates in the Game Lore Keeper.
 
-### 7. Sequential Generation Utility (`utils/sequential-generation.ts`)
-
-Implements sequential generation to maintain coherence and prevent the LLM from going off-topic.
-
-```typescript
-// utils/sequential-generation.ts
-import { ChatCompletionRequestMessage } from 'openai';
-
-export async function sequentialGeneration(
-  initialPrompt: string,
-  generateFunc: (prevContent: string) => Promise<any>,
-  maxIterations: number = 3
-): Promise<string> {
-  let content = initialPrompt;
-  let result = '';
-
-  for (let i = 0; i < maxIterations; i++) {
-    const response = await generateFunc(content);
-    const newContent = response.data.choices[0].message?.content || '';
-    result += newContent;
-    content = `${content}\n${newContent}\nContinue the story:`;
-  }
-
-  return result;
-}
-```
-
-## API Routes
-
-### 1. Game Action (`app/api/game-action/route.ts`)
-
-Handles all game actions, updating the game state and generating responses.
-
-```typescript
-// app/api/game-action/route.ts
-import { NextResponse } from 'next/server';
-import { processGameAction } from '@/lib/game-engine';
-
-export async function POST(req: Request) {
-  const { action, gameState } = await req.json();
-  const updatedGameState = await processGameAction(action, gameState);
-  return NextResponse.json(updatedGameState);
-}
-```
-
-### 2. Save Game (`app/api/save-game/route.ts`)
-
-Handles saving the game state and generating a unique code.
-
-### 3. Load Game (`app/api/load-game/route.ts`)
-
-Handles loading a game state using a unique code.
+8. Rule Evolution:
+   - The game's rule set can evolve organically as the story progresses.
+   - Players and the LLM can establish new rules or modify existing ones, all tracked by the Game Lore Keeper.
 
 ## Getting Started
 
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Set up environment variables in `.env.local`:
-
-```plaintext
-OPENAI_API_KEY=your_api_key_here
 ```
 
+OPENAI_API_KEY=your_api_key_here
+UPSTASH_REDIS_REST_URL=your_upstash_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
 
+```plaintext
 4. Run the development server: `npm run dev`
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-
-## Key Concepts
-
-1. **Open-ended Character Creation**: Players can describe their characters in natural language, and the LLM will interpret and create appropriate game statistics.
-2. **Flexible Party System**: Parties can consist of any number or type of characters, with the LLM managing party dynamics and interactions.
-3. **Adaptive Game Mechanics**: Instead of fixed rules for health, experience, or equipment, the LLM interprets the game state and player actions to determine outcomes.
-4. **Dynamic Storytelling**: The story evolves based on player actions and the current game state, creating a unique experience for each playthrough.
-5. **Content Moderation**: Safeguards are in place to ensure appropriate content and maintain the game's theme and tone.
-6. **Sequential Generation**: This technique is used to maintain coherence in the narrative and prevent the LLM from going off-topic.
-
-
-## Future Enhancements
-
-1. Implement a more sophisticated save/load system with cloud storage
-2. Add audio effects or background music to enhance the 8-bit aesthetic
-3. Implement a combat system that leverages the LLM for dynamic, narrative-driven encounters
-4. Create a visual inventory or character sheet system within the terminal interface
-5. Develop a system for player choices to have long-term consequences on the game world
-
 
 ## Contributing
 

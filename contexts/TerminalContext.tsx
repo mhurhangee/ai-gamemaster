@@ -1,21 +1,24 @@
-'use client'
+"use client"
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react'
-import { useChat, Message } from 'ai/react'
-import { useRouter } from 'next/navigation'
-import { handleCommand, WELCOME_MESSAGE } from '@/components/terminal/TerminalCommands'
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import { Message } from 'ai'
+import { GameState } from '@/types/game-state'
+import { processGameAction } from '@/lib/game-engine'
+import { saveGame, loadGame } from '@/lib/save-load-manager'
+import { initializeGameLore } from '@/lib/game-lore-keeper'
 
 interface TerminalContextType {
   messages: Message[]
   input: string
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  error: Error | null
+  gameState: GameState
   isLoading: boolean
-  stop: () => void
-  isFullscreen: boolean
-  toggleFullscreen: () => void
-  inputRef: React.RefObject<HTMLInputElement>
+  error: Error | null
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  updateGameState: (newState: Partial<GameState>) => void
+  processAction: (action: string) => Promise<void>
+  saveCurrentGame: () => Promise<string>
+  loadSavedGame: (saveCode: string) => Promise<void>
 }
 
 const TerminalContext = createContext<TerminalContextType | undefined>(undefined)
@@ -29,68 +32,102 @@ export const useTerminal = () => {
 }
 
 export const TerminalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const router = useRouter()
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    error,
-    reload,
-    setMessages,
-    setInput,
-    isLoading,
-    stop,
-  } = useChat({
-    initialMessages: [
-      { role: "system", content: WELCOME_MESSAGE, id: "welcome" },
-    ],
-    keepLastMessageOnError: true,
-    onError: (error) => {
-      console.error("Chat error:", error)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [gameState, setGameState] = useState<GameState>({
+    party: [],
+    world: {
+      locations: {},
+      time: 'dawn',
+      weather: 'clear',
+      events: [],
     },
+    currentLocation: 'start',
+    inventory: [],
+    questLog: [],
+    gameLore: initializeGameLore(),
   })
 
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [messages])
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }, [])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      const trimmedInput = input.trim()
-
-      if (trimmedInput.startsWith("/")) {
-        handleCommand(trimmedInput.slice(1), {
-          setMessages,
-          reload,
-          toggleFullscreen: () => setIsFullscreen(!isFullscreen),
-          navigateBack: () => router.back(),
-          navigateHome: () => router.push('/'),
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (input.trim() !== '') {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await fetch('/api/test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: [...messages, { role: 'user', content: input }],
+          }),
         })
-        setInput("")
-      } else {
-        handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)
+        const data = await response.json()
+        if (data.error) {
+          throw new Error(data.error)
+        }
+        setMessages(data.messages)
+        setGameState(prevState => ({ ...prevState, ...data.gameState }))
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('An unexpected error occurred'))
+      } finally {
+        setIsLoading(false)
+        setInput('')
       }
     }
-  }
+  }, [input, messages])
 
-  const toggleFullscreen = () => setIsFullscreen(!isFullscreen)
+  const updateGameState = useCallback((newState: Partial<GameState>) => {
+    setGameState((prevState) => ({ ...prevState, ...newState }))
+  }, [])
 
-  const value: TerminalContextType = {
-    messages,
-    input,
-    handleInputChange,
-    handleKeyDown,
-    error: error || null,
-    isLoading,
-    stop,
-    isFullscreen,
-    toggleFullscreen,
-    inputRef,
-  }
+  const processAction = useCallback(async (action: string) => {
+    if (action.trim() !== '') {
+      const updatedState = await processGameAction(gameState, action, '')
+      setGameState(updatedState)
+    }
+  }, [gameState])
 
-  return <TerminalContext.Provider value={value}>{children}</TerminalContext.Provider>
+  const saveCurrentGame = useCallback(async () => {
+    const saveCode = await saveGame(gameState)
+    return saveCode
+  }, [gameState])
+
+  const loadSavedGame = useCallback(async (saveCode: string) => {
+    const loadedState = await loadGame(saveCode)
+    if (loadedState) {
+      setGameState(loadedState)
+      setMessages([{ role: 'system', content: 'Game loaded successfully.', id: 'load' }])
+      processAction('/load ' + saveCode)
+    } else {
+      setMessages([{ role: 'system', content: 'Failed to load game.', id: 'load-error' }])
+    }
+  }, [processAction])
+
+  return (
+    <TerminalContext.Provider
+      value={{
+        messages,
+        input,
+        gameState,
+        isLoading,
+        error,
+        handleInputChange,
+        handleSubmit,
+        updateGameState,
+        processAction,
+        saveCurrentGame,
+        loadSavedGame,
+      }}
+    >
+      {children}
+    </TerminalContext.Provider>
+  )
 }

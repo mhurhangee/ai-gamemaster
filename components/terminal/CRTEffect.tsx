@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { EBButton } from "./EBButton"
-import { EBDropdown, EBDropdownTrigger, EBDropdownContent, EBDropdownItem, EBDropdownSeparator } from "./EBDropdown"
+import { EBButton } from "@/components/EBButton"
+import { EBDropdown, EBDropdownTrigger, EBDropdownContent, EBDropdownItem, EBDropdownSeparator } from "@/components/EBDropdown"
 
 interface EffectState {
   pixel: boolean

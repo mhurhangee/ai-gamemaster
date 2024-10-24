@@ -1,5 +1,6 @@
 import React from 'react'
 import '@/styles/main.css'
+import { TerminalProvider } from '@/contexts/TerminalContext'
 
 
 export const metadata = {
@@ -13,6 +14,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+    <TerminalProvider>
     <html lang="en">
       <body >
         <main className="min-h-screen bg-background">
@@ -20,5 +22,6 @@ export default function RootLayout({
         </main>
       </body>
     </html>
+    </TerminalProvider>
   )
 }

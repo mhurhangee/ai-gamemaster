@@ -4,8 +4,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useTerminal } from '@/contexts/TerminalContext'
 
 export const TerminalInput: React.FC = () => {
-  const { input, handleInputChange, handleKeyDown, inputRef } = useTerminal()
+  const { input, handleInputChange, handleSubmit, isLoading } = useTerminal()
   const [caretPosition, setCaretPosition] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -46,12 +47,17 @@ export const TerminalInput: React.FC = () => {
     return 0
   }
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    handleKeyDown(e)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (input.trim() !== '') {
+        handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)
+      }
+    }
     updateCaretPosition()
   }
 
-  const handleInputClick = () => {
+  const handleClick = () => {
     updateCaretPosition()
   }
 
@@ -62,15 +68,13 @@ export const TerminalInput: React.FC = () => {
         <input
           type="text"
           value={input}
-          onChange={(e) => {
-            handleInputChange(e)
-            updateCaretPosition()
-          }}
-          onKeyDown={handleInputKeyDown}
-          onClick={handleInputClick}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onClick={handleClick}
           className="terminal-input"
           ref={inputRef}
           autoFocus
+          disabled={isLoading}
         />
         <div
           ref={caretRef}

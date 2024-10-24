@@ -1,0 +1,89 @@
+{"level":"info","message":"Received POST request to game route","timestamp":"2024-10-24T12:06:16.925Z"}
+{"level":"info","message":"Received 2 messages and game state","timestamp":"2024-10-24T12:06:16.932Z"}
+{"level":"info","message":"Processing last message: hi","timestamp":"2024-10-24T12:06:16.933Z"}
+{"level":"info","message":"Sending request to OpenAI","timestamp":"2024-10-24T12:06:17.544Z"}
+{"level":"info","message":"Received POST request to game route","timestamp":"2024-10-24T12:12:44.393Z"}
+{"level":"info","message":"Received 2 messages and game state","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:12:44.398Z"}
+{"level":"info","message":"Processing last message: hi","timestamp":"2024-10-24T12:12:44.398Z"}
+{"level":"info","message":"Sending request to OpenAI","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"model":"gpt-4o-mini","prompt":"\nCurrent Game State:\n{\n  \"party\": [],\n  \"world\": {\n    \"locations\": {},\n    \"time\": \"dawn\",\n    \"weather\": \"clear\",\n    \"events\": []\n  },\n  \"currentLocation\": \"start\",\n  \"inventory\": [],\n  \"questLog\": [],\n  \"gameLore\": {}\n}\n\nUser Action:\nhi\n\nBased on the current game state and user action, generate an appropriate response and advance the story.\n","system":"You are an AI RPG GameMaster. Respond to the player's actions and advance the story based on the current game state.","timestamp":"2024-10-24T12:12:44.956Z"}
+{"level":"info","message":"Received POST request to game route","timestamp":"2024-10-24T12:16:37.877Z"}
+{"level":"info","message":"Received 2 messages and game state","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:16:37.881Z"}
+{"level":"info","message":"Processing last message: hi","timestamp":"2024-10-24T12:16:37.882Z"}
+{"level":"info","message":"Sending request to OpenAI","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"model":"gpt-4o-mini","prompt":"\nCurrent Game State:\n{\n  \"party\": [],\n  \"world\": {\n    \"locations\": {},\n    \"time\": \"dawn\",\n    \"weather\": \"clear\",\n    \"events\": []\n  },\n  \"currentLocation\": \"start\",\n  \"inventory\": [],\n  \"questLog\": [],\n  \"gameLore\": {}\n}\n\nUser Action:\nhi\n\nBased on the current game state and user action, generate an appropriate response and advance the story.\n","system":"You are an AI RPG GameMaster. Respond to the player's actions and advance the story based on the current game state.","timestamp":"2024-10-24T12:16:38.476Z"}
+{"level":"info","message":"Received POST request to game route","timestamp":"2024-10-24T12:17:21.526Z"}
+{"level":"info","message":"Received 2 messages and game state","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:17:21.530Z"}
+{"level":"info","message":"Processing last message: hi","timestamp":"2024-10-24T12:17:21.531Z"}
+{"level":"info","message":"Sending request to OpenAI","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"model":"gpt-4o-mini","prompt":"\nCurrent Game State:\n{\n  \"party\": [],\n  \"world\": {\n    \"locations\": {},\n    \"time\": \"dawn\",\n    \"weather\": \"clear\",\n    \"events\": []\n  },\n  \"currentLocation\": \"start\",\n  \"inventory\": [],\n  \"questLog\": [],\n  \"gameLore\": {}\n}\n\nUser Action:\nhi\n\nBased on the current game state and user action, generate an appropriate response and advance the story.\n","system":"You are an AI RPG GameMaster. Respond to the player's actions and advance the story based on the current game state.","timestamp":"2024-10-24T12:17:22.195Z"}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"Welcome to the AI Gamemaster! Type /help to see available commands.","role":"system"},{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:19:05.155Z"}
+{"level":"info","message":"Received response from OpenAI","timestamp":"2024-10-24T12:19:05.554Z"}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:20:05.782Z"}
+{"level":"info","message":"Received response from OpenAI","timestamp":"2024-10-24T12:20:06.266Z"}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T12:24:21.132Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T12:24:21.134Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"Hello","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.660Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"!","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.671Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" How","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.672Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" can","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.685Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" I","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.686Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" assist","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.732Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" you","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.735Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" today","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.754Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"?","type":"text-delta"},"timestamp":"2024-10-24T12:24:21.756Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Hello! How can I assist you today?","timestamp":"2024-10-24T12:24:21.769Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"fullResponse":"Hello! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T12:24:21.770Z"}
+{"finalText":"Hello! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T12:24:21.770Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T14:07:37.532Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:07:37.538Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"Hello","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.569Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"!","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.634Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" How","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.636Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" can","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.662Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" I","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.664Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" assist","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.675Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" you","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.677Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" today","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.678Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"?","type":"text-delta"},"timestamp":"2024-10-24T14:07:38.679Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Hello! How can I assist you today?","timestamp":"2024-10-24T14:07:38.684Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"fullResponse":"Hello! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:07:38.688Z"}
+{"finalText":"Hello! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:07:38.688Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"test","role":"user"}],"timestamp":"2024-10-24T14:09:00.449Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:09:00.451Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"Test","type":"text-delta"},"timestamp":"2024-10-24T14:09:00.980Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" received","type":"text-delta"},"timestamp":"2024-10-24T14:09:00.990Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"!","type":"text-delta"},"timestamp":"2024-10-24T14:09:00.991Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" How","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.013Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" can","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.015Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" I","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.048Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" assist","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.049Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" you","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.067Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":" today","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.068Z"}
+{"level":"info","message":"Received text chunk","text":{"textDelta":"?","type":"text-delta"},"timestamp":"2024-10-24T14:09:01.069Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Test received! How can I assist you today?","timestamp":"2024-10-24T14:09:01.082Z","usage":{"completionTokens":10,"promptTokens":8,"totalTokens":18}}
+{"fullResponse":"Test received! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:09:01.082Z"}
+{"finalText":"Test received! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:09:01.083Z","usage":{"completionTokens":10,"promptTokens":8,"totalTokens":18}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"test","role":"user"},{"content":"TEST MESSAGE","role":"user"}],"timestamp":"2024-10-24T14:17:28.743Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:17:28.748Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Test message received! How can I assist you today?","timestamp":"2024-10-24T14:17:29.472Z","usage":{"completionTokens":11,"promptTokens":14,"totalTokens":25}}
+{"fullResponse":"Test message received! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:17:29.473Z"}
+{"finalText":"Test message received! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:17:29.474Z","usage":{"completionTokens":11,"promptTokens":14,"totalTokens":25}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T14:21:25.076Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:21:25.078Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Hello! How can I assist you today?","timestamp":"2024-10-24T14:21:25.758Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"fullResponse":"Hello! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:21:25.759Z"}
+{"finalText":"Hello! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:21:25.759Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T14:22:11.020Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:22:11.022Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Hello! How can I assist you today?","timestamp":"2024-10-24T14:22:11.793Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"fullResponse":"Hello! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:22:11.796Z"}
+{"finalText":"Hello! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:22:11.796Z","usage":{"completionTokens":9,"promptTokens":8,"totalTokens":17}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"test","role":"user"}],"timestamp":"2024-10-24T14:22:25.652Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T14:22:25.653Z"}
+{"finishReason":"stop","level":"info","message":"Stream finished","text":"Test received! How can I assist you today?","timestamp":"2024-10-24T14:22:26.267Z","usage":{"completionTokens":10,"promptTokens":8,"totalTokens":18}}
+{"fullResponse":"Test received! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T14:22:26.269Z"}
+{"finalText":"Test received! How can I assist you today?","finishReason":"stop","level":"info","message":"Final results","timestamp":"2024-10-24T14:22:26.269Z","usage":{"completionTokens":10,"promptTokens":8,"totalTokens":18}}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"}],"timestamp":"2024-10-24T16:31:15.120Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T16:31:15.122Z"}
+{"aiResponse":"Hello! How can I assist you today?","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T16:31:15.840Z"}
+{"level":"info","message":"Received POST request to test-openai route","messages":[{"content":"hi","role":"user"},{"content":"Hello! How can I assist you today?","role":"assistant"},{"content":"tell me a joke","role":"user"}],"timestamp":"2024-10-24T16:31:20.770Z"}
+{"level":"info","message":"Calling OpenAI API","timestamp":"2024-10-24T16:31:20.770Z"}
+{"aiResponse":"Sure! Here’s one for you:\n\nWhy did the scarecrow win an award?\n\nBecause he was outstanding in his field!","level":"info","message":"Full OpenAI response","timestamp":"2024-10-24T16:31:21.487Z"}

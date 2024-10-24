@@ -16,13 +16,12 @@ export const WELCOME_MESSAGE =
 interface CommandHandlers {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
   reload: () => void
-  toggleFullscreen: () => void
   navigateBack: () => void
   navigateHome: () => void
 }
 
 export function handleCommand(command: string, handlers: CommandHandlers) {
-  const { setMessages, reload, toggleFullscreen, navigateBack, navigateHome } = handlers
+  const { setMessages, reload, navigateBack, navigateHome } = handlers
   const lowerCommand = command.toLowerCase()
 
   switch (lowerCommand) {
@@ -56,9 +55,6 @@ export function handleCommand(command: string, handlers: CommandHandlers) {
         }
         return newMessages
       })
-      break
-    case "fullscreen":
-      toggleFullscreen()
       break
     case "exit":
       navigateBack()
