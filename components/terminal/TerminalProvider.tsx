@@ -9,6 +9,12 @@ interface Message {
   id: string
 }
 
+interface GameState {
+  party: any
+  story: any
+  inventory: any
+}
+
 interface TerminalContextType {
   messages: Message[]
   input: string
@@ -25,7 +31,11 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  // gameState store and initial with "newGame" as stored gameState
+  const [gameState, setGameState] = useState<GameState>({
+    party: {},
+    story: { isNewGame: true },
+    inventory: {}
+  })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
@@ -45,7 +55,7 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const response = await fetch('/api/game-engine', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage]/*, gameState: storedGameState */ }),
+        body: JSON.stringify({ messages: [...messages, userMessage], gameState }),
       })
 
       if (!response.ok) throw new Error('Failed to fetch response')
@@ -53,8 +63,8 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const data = await response.json()
       const assistantMessage: Message = { role: 'assistant', content: data.content, id: Date.now().toString() }
       
-      //logger.info(TerminalProvider,ts: data.gameState)
-      //Store gameState 
+      logger.info('TerminalProvider.tsx - gameState:', data.gameState)
+      setGameState(data.gameState)
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (err) {
@@ -62,7 +72,7 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setIsLoading(false)
     }
-  }, [input, messages])
+  }, [input, messages, gameState])
 
   return (
     <TerminalContext.Provider

@@ -13,8 +13,8 @@ body, html {
   flex-direction: column;
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Press Start 2P', cursive;
-  font-size: 14px;
+  font-family: 'VT323', cursive;
+  font-size: 18px;
   line-height: 1.5;
 }
 
