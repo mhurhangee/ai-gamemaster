@@ -1,7 +1,4 @@
 @media (max-width: 768px) {
-  .terminal-container {
-    padding: 10px;
-  }
 
   .terminal-header h2 {
     font-size: 18px;

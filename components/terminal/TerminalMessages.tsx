@@ -1,18 +1,7 @@
-"use client"
+'use client'
 
-import React from 'react'
-
-interface Message {
-  role: 'user' | 'assistant' | 'system' | 'function' | 'tool' | 'data'
-  content: string
-  id: string
-}
-
-interface TerminalMessagesProps {
-  messages: Message[]
-  isLoading: boolean
-  error: Error | null
-}
+import React, { useEffect, useRef } from 'react'
+import { useTerminal } from '@/components/terminal/TerminalProvider'
 
 const LoadingAnimation = () => {
   const frames = ["|", "/", "-", "\\"]
@@ -28,27 +17,31 @@ const LoadingAnimation = () => {
   return <span className="loading-animation">{frames[frame]}</span>
 }
 
-export const TerminalMessages: React.FC<TerminalMessagesProps> = ({ messages, isLoading, error }) => {
+export const TerminalMessages: React.FC = () => {
+  const { messages, isLoading, error } = useTerminal()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
   return (
-    <div className="terminal-scroll-area">
+    <div className="terminal-messages custom-scrollbar">
       {messages.map((message) => (
-        <div key={message.id} className="message">
-          <span className={`message-role ${message.role}-message`}>
+        <div key={message.id} className={`message ${message.role}-message`}>
+          <span className={`message-prompt ${message.role}-prompt`}>
             {message.role === 'user' ? '> ' : message.role === 'assistant' ? '$ ' : '! '}
           </span>
-          <span className={`message-content ${message.role}-message`}>{message.content}</span>
+          <span className="message-content">{message.content}</span>
         </div>
       ))}
       {isLoading && (
-          <span className="message-content"> <LoadingAnimation />
-          </span>
-      )}
-      {error && (
         <div className="message">
-          <span className="message-role system-message">! </span>
-          <span className="message-content error-message">{error.message}</span>
+          <LoadingAnimation />
         </div>
       )}
+      {error && <div className="message error-message">{error.message}</div>}
+      <div ref={messagesEndRef} />
     </div>
   )
 }

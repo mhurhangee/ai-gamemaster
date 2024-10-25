@@ -1,6 +1,6 @@
 import React from 'react'
 import '@/styles/main.css'
-import { TerminalProvider } from '@/contexts/TerminalContext'
+import { TerminalProvider } from '@/components/terminal/TerminalProvider'
 
 
 export const metadata = {

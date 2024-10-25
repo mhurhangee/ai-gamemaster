@@ -1,28 +1,10 @@
-// logger.ts
+import util from 'util'
 
-import { createLogger, format, transports } from 'winston';
-
-const logger = createLogger({
-  level: 'info',
-  format: format.combine(
-    format.timestamp(),
-    format.json()
-  ),
-  transports: [
-    new transports.Console(),
-    new transports.File({ filename: 'error.log', level: 'error' }),
-    new transports.File({ filename: 'combined.log' }),
-  ],
-});
-
-// If we're not in production, also log to the console with colorized output
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new transports.Console({
-    format: format.combine(
-      format.colorize(),
-      format.simple()
-    ),
-  }));
-}
+const logger = {
+  info: (...args: any[]) => console.log('\x1b[36m%s\x1b[0m', '[INFO]', util.format(...args)),
+  warn: (...args: any[]) => console.warn('\x1b[33m%s\x1b[0m', '[WARN]', util.format(...args)),
+  error: (...args: any[]) => console.error('\x1b[31m%s\x1b[0m', '[ERROR]', util.format(...args)),
+  debug: (...args: any[]) => console.log('\x1b[35m%s\x1b[0m', '[DEBUG]', util.format(...args)),
+};
 
 export default logger;

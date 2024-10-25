@@ -1,3 +1,5 @@
+// types/game-state.ts
+
 export interface Character {
   name: string;
   description: string;
