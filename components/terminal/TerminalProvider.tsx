@@ -1,18 +1,14 @@
 'use client'
 
 import logger from '@/lib/logger'
-import React, { createContext, useState, useContext, useCallback } from 'react'
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react'
+import { GameState } from '@/types/GameState'
+import { generateWelcomeMessage } from '@/lib/welcomeMessage'
 
 interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
   id: string
-}
-
-interface GameState {
-  party: any
-  story: any
-  inventory: any
 }
 
 interface TerminalContextType {
@@ -22,6 +18,7 @@ interface TerminalContextType {
   error: Error | null
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  isSetupPhase: boolean
 }
 
 const TerminalContext = createContext<TerminalContextType | undefined>(undefined)
@@ -32,10 +29,31 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [gameState, setGameState] = useState<GameState>({
-    party: {},
-    story: { isNewGame: true },
-    inventory: {}
+    loreAndWorldbuilding: {},
+    rulesAndMechanics: {},
+    charactersAndParties: {},
+    questsAndObjectives: { activeQuests: [] },
+    inventoryAndResources: {},
+    dialogueAndInteraction: {},
+    environmentAndExploration: {},
+    combatAndEncounters: {},
+    progressionAndSkills: {},
+    economyAndTrading: {},
+    settingsAndOptions: {},
+    setupPhase: {
+      completed: false,
+      currentAspect: null
+    }
   })
+
+  useEffect(() => {
+    const welcomeMessage: Message = {
+      role: 'assistant',
+      content: generateWelcomeMessage(),
+      id: 'welcome'
+    }
+    setMessages([welcomeMessage])
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
@@ -67,12 +85,24 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setGameState(data.gameState)
 
       setMessages(prev => [...prev, assistantMessage])
+
+      // Check if setup phase is completed
+      if (data.gameState.setupPhase && data.gameState.setupPhase.completed) {
+        const setupCompleteMessage: Message = {
+          role: 'system',
+          content: 'Setup phase completed. The main game is now starting.',
+          id: 'setup-complete'
+        }
+        setMessages(prev => [...prev, setupCompleteMessage])
+      }
     } catch (err) {
       setError(err instanceof Error ? err : new Error('An unknown error occurred'))
     } finally {
       setIsLoading(false)
     }
   }, [input, messages, gameState])
+
+  const isSetupPhase = !gameState.setupPhase.completed
 
   return (
     <TerminalContext.Provider
@@ -83,6 +113,7 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         error,
         handleInputChange,
         handleSubmit,
+        isSetupPhase
       }}
     >
       {children}

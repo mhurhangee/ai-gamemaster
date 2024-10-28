@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
   //logger.info('route.ts - messages:', messages)
 
   const gameManagerResponse = await gameManager(messages, gameState)
-  logger.info('route.ts - gameManagerResponse:', gameManagerResponse)
+  //logger.info('route.ts - gameManagerResponse:', gameManagerResponse)
 
   const narratorResponse = await narratorEngine(messages, gameManagerResponse)
-  logger.info('route.ts - narratorResponse:', narratorResponse.slice(0,25), '...')
+  //logger.info('route.ts - narratorResponse:', narratorResponse.slice(0,25), '...')
 
   return Response.json({ content: narratorResponse, gameState: gameManagerResponse.gameState })
 }
