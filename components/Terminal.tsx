@@ -1,18 +1,23 @@
 'use client'
 
 import React from 'react'
-import { TerminalProvider } from '@/contexts/TerminalContext'
-import { TerminalContainer } from './terminal/TerminalContainer'
-import { TerminalContent } from './terminal/TerminalContent'
-import CRTEffect from './CRTEffect'
+import { TerminalMessages } from './TerminalMessages'
+import { TerminalInput } from './TerminalInput'
+import { TerminalProvider } from './TerminalProvider'
+import CRTEffect from "./CRTEffect"
 
 export const Terminal: React.FC = () => {
   return (
     <TerminalProvider>
       <CRTEffect>
-        <TerminalContainer>
-          <TerminalContent />
-        </TerminalContainer>
+        <div className='terminal-container'>
+          <div className="terminal-content">
+            <div className="terminal-body">
+              <TerminalMessages />
+              <TerminalInput />
+            </div>
+          </div>
+        </div>
       </CRTEffect>
     </TerminalProvider>
   )
