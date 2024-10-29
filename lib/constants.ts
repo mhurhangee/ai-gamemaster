@@ -168,13 +168,23 @@ export const LLM: Record<string, LLMConfig> = {
     SYSTEM: `You are an AI assistant that determines if the game setup is complete. Respond with either 'true' or 'false'.`,
     PROMPT: `
       # CONTEXT FOR RESPONSE
-      Analyze the following game state and determine if it's sufficiently complete to begin the main game adventure.
+      Analyze the following game state, and the AI and User's messages and determine if it's sufficiently complete to begin the main game adventure.
 
       ## Game state
       """
       {{gameState}}
       """
+
+      ## AI response
+      """
+      {{lastAIResponse}}
+      """
       
+      ## User message
+      """
+      {{lastUserMessage}}
+      """
+
       ## Consider the following aspects
       """
       {{aspects}}
