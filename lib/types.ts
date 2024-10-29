@@ -1,3 +1,5 @@
+// types.ts
+
 import { GameAspect } from './constants'
 
 export interface Message {
@@ -17,17 +19,9 @@ export interface TerminalContextType {
 }
 
 export interface GameState {
-  loreAndWorldbuilding: Record<string, any>
-  rulesAndMechanics: Record<string, any>
-  charactersAndParties: Record<string, any>
-  questsAndObjectives: Record<string, any>
-  inventoryAndResources: Record<string, any>
-  dialogueAndInteraction: Record<string, any>
-  environmentAndExploration: Record<string, any>
-  combatAndEncounters: Record<string, any>
-  progressionAndSkills: Record<string, any>
-  economyAndTrading: Record<string, any>
-  settingsAndOptions: Record<string, any>
+  worldAndLore: Record<string, any>
+  charactersAndMechanics: Record<string, any>
+  questsAndProgression: Record<string, any>
   setupPhase: {
     completed: boolean
     currentAspect: GameAspect | null

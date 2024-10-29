@@ -1,25 +1,11 @@
+// TerminalProvider.tsx
+
 'use client'
 
 import logger from '@/lib/logger'
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react'
-import { GameState } from '@/lib/types'
+import { GameState, Message, TerminalContextType } from '@/lib/types'
 import { generateWelcomeMessage } from '@/lib/constants'
-
-interface Message {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  id: string
-}
-
-interface TerminalContextType {
-  messages: Message[]
-  input: string
-  isLoading: boolean
-  error: Error | null
-  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-  isSetupPhase: boolean
-}
 
 const TerminalContext = createContext<TerminalContextType | undefined>(undefined)
 
@@ -29,17 +15,9 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [gameState, setGameState] = useState<GameState>({
-    loreAndWorldbuilding: {},
-    rulesAndMechanics: {},
-    charactersAndParties: {},
-    questsAndObjectives: {},
-    inventoryAndResources: {},
-    dialogueAndInteraction: {},
-    environmentAndExploration: {},
-    combatAndEncounters: {},
-    progressionAndSkills: {},
-    economyAndTrading: {},
-    settingsAndOptions: {},
+    worldAndLore: {},
+    charactersAndMechanics: {},
+    questsAndProgression: {},
     setupPhase: {
       completed: false,
       currentAspect: null,
