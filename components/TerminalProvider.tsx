@@ -32,7 +32,7 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loreAndWorldbuilding: {},
     rulesAndMechanics: {},
     charactersAndParties: {},
-    questsAndObjectives: { activeQuests: [] },
+    questsAndObjectives: {},
     inventoryAndResources: {},
     dialogueAndInteraction: {},
     environmentAndExploration: {},
@@ -80,15 +80,15 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (!response.ok) throw new Error('Failed to fetch response')
 
       const data = await response.json()
-      const assistantMessage: Message = { role: 'assistant', content: data.content, id: Date.now().toString() }
+      const assistantMessage: Message = { role: 'assistant', content: data.narratorResponse, id: Date.now().toString() }
       
-      logger.info('TerminalProvider.tsx - gameState:', data.gameState)
+      logger.info('TerminalProvider.tsx - updatedGameState:', data.gameState)
       setGameState(data.gameState)
 
       setMessages(prev => [...prev, assistantMessage])
 
       // Check if setup phase is completed
-      if (data.gameState.setupPhase && data.gameState.setupPhase.completed) {
+      if (data.gameState.setupPhase.completed && !gameState.setupPhase.completed) {
         const setupCompleteMessage: Message = {
           role: 'system',
           content: 'Setup phase completed. The main game is now starting.',

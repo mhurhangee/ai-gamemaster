@@ -1,27 +1,98 @@
-import { CoreMessage, generateObject } from 'ai'
-import { MANAGER_CONFIGS, LLM, DETECTOR_SCHEMA, GameAspect } from './constants'
+// gameManager.ts
+
+import { CoreMessage } from 'ai'
+import { MANAGER_CONFIGS, GameAspect } from './constants'
 import { GameState } from './types'
-import { setupNarrator } from './setupNarrator'
-import { mainGameNarrator } from './mainGameNarrator'
+import { generateAI } from './aiWrappers'
 import logger from './logger'
 
 export async function gameManager(messages: CoreMessage[], previousGameState: Partial<GameState>): Promise<{ gameState: GameState; narratorResponse: string }> {
-  logger.debug('gameManager.ts - messages:', messages.slice(-2))
-  logger.debug('gameManager.ts - previousGameState:', JSON.stringify(previousGameState, null, 2))
-
+  const gameState: GameState = initializeGameState(previousGameState)
+  logger.debug('gameManager: Initial game state', JSON.stringify(gameState, null, 2))
+  
   const lastUserMessage = String(messages[messages.length - 1].content)
   const lastAIResponse = messages.length > 1 ? String(messages[messages.length - 2].content) : ''
 
-  const gameState: GameState = initializeGameState(previousGameState)
-
   if (!gameState.setupPhase.completed) {
+    logger.debug('gameManager: Entering setup phase')
     return handleSetupPhase(gameState, lastUserMessage)
+  } else {
+    logger.debug('gameManager: Entering main game phase')
+    return handleMainGame(gameState, lastUserMessage, lastAIResponse)
+  }
+}
+
+async function handleSetupPhase(gameState: GameState, userMessage: string): Promise<{ gameState: GameState; narratorResponse: string }> {
+  logger.debug('handleSetupPhase: Starting setup phase', { currentAspect: gameState.setupPhase.currentAspect, aspectsCompleted: gameState.setupPhase.aspectsCompleted })
+
+  const narratorResponse = await generateAI('SETUP_NARRATOR', { gameState, userMessage }) as string
+  logger.debug('handleSetupPhase: Generated narrator response', { narratorResponse: narratorResponse.substring(0, 100) + '...' })
+  
+  const updatedGameState = await updateGameState(gameState, userMessage, narratorResponse)
+  logger.debug('handleSetupPhase: Updated game state', JSON.stringify(updatedGameState, null, 2))
+  
+  const setupComplete = await isSetupComplete(updatedGameState)
+  logger.debug('handleSetupPhase: Setup complete check', { setupComplete })
+  
+  if (setupComplete) {
+    updatedGameState.setupPhase.completed = true
+    const storySeed = await generateAI('STORY_SEED_GENERATOR', { gameState: updatedGameState }) as string
+    logger.debug('handleSetupPhase: Setup completed, generated story seed', { storySeed: storySeed.substring(0, 100) + '...' })
+    return { 
+      gameState: updatedGameState, 
+      narratorResponse: narratorResponse + "\n\nSetup complete! Your adventure begins:\n" + storySeed 
+    }
+  }
+  
+  logger.debug('handleSetupPhase: Setup phase continuing')
+  return { gameState: updatedGameState, narratorResponse }
+}
+
+async function updateGameState(gameState: GameState, userMessage: string, narratorResponse: string): Promise<GameState> {
+  logger.debug('updateGameState: Starting state update', { userMessage, narratorResponse: narratorResponse.substring(0, 100) + '...' })
+
+  const aspectToUpdate = await generateAI('DETECTOR', { gameState, lastAIResponse: narratorResponse, lastUserMessage: userMessage }) as GameAspect
+  logger.debug('updateGameState: Detected aspect to update', { aspectToUpdate })
+
+  if (aspectToUpdate in MANAGER_CONFIGS) {
+    logger.debug(`updateGameState: Updating aspect - ${aspectToUpdate}`)
+    const result = await generateAI('ASPECT_UPDATER', { 
+      aspect: aspectToUpdate, 
+      lastAIResponse: narratorResponse, 
+      lastUserMessage: userMessage,
+      aspectState: gameState[aspectToUpdate]
+    })
+    logger.debug(`updateGameState: Aspect update result`, { aspect: aspectToUpdate, result })
+    gameState[aspectToUpdate] = result as Record<string, any>
   }
 
-  return handleMainGame(gameState, lastUserMessage, lastAIResponse)
+  logger.debug('updateGameState: Updated game state', JSON.stringify(gameState, null, 2))
+  return gameState
+}
+
+async function isSetupComplete(gameState: GameState): Promise<boolean> {
+  const aspects = Object.keys(MANAGER_CONFIGS).join(', ')
+  const completionResponse = await generateAI('SETUP_COMPLETE_CHECKER', { gameState, aspects }) as 'true' | 'false'
+  const isComplete = completionResponse === 'true'
+  logger.debug(`isSetupComplete: Setup complete check`, { isComplete, gameState: JSON.stringify(gameState, null, 2) })
+  return isComplete
+}
+
+async function handleMainGame(gameState: GameState, lastUserMessage: string, lastAIResponse: string): Promise<{ gameState: GameState; narratorResponse: string }> {
+  logger.debug('handleMainGame: Starting main game phase', { lastUserMessage, lastAIResponse: lastAIResponse.substring(0, 100) + '...' })
+
+  gameState = await updateGameState(gameState, lastUserMessage, lastAIResponse)
+  logger.debug('handleMainGame: Updated game state', JSON.stringify(gameState, null, 2))
+
+  const narratorResponse = await generateAI('MAIN_GAME_NARRATOR', { gameState, lastUserMessage, lastAIResponse }) as string
+  logger.debug('handleMainGame: Generated narrator response', { narratorResponse: narratorResponse.substring(0, 100) + '...' })
+
+  return { gameState, narratorResponse }
 }
 
 function initializeGameState(previousGameState: Partial<GameState>): GameState {
+  logger.debug('initializeGameState: Initializing game state')
+  // Initialize each aspect of the game state, using previous state if available
   return {
     ...previousGameState,
     loreAndWorldbuilding: previousGameState.loreAndWorldbuilding || {},
@@ -37,75 +108,4 @@ function initializeGameState(previousGameState: Partial<GameState>): GameState {
     settingsAndOptions: previousGameState.settingsAndOptions || {},
     setupPhase: previousGameState.setupPhase || { completed: false, currentAspect: null, aspectsCompleted: [] }
   } as GameState
-}
-
-async function handleSetupPhase(gameState: GameState, userMessage: string): Promise<{ gameState: GameState; narratorResponse: string }> {
-  const aspects = Object.keys(MANAGER_CONFIGS) as GameAspect[]
-  let currentAspect = gameState.setupPhase.currentAspect || aspects[0]
-
-  logger.debug(`handleSetupPhase - Current aspect: ${currentAspect}`)
-
-  const { narratorResponse, aspectComplete } = await setupNarrator(currentAspect, userMessage, gameState[currentAspect])
-
-  if (aspectComplete) {
-    gameState.setupPhase.aspectsCompleted.push(currentAspect)
-    const nextAspectIndex = aspects.findIndex(aspect => !gameState.setupPhase.aspectsCompleted.includes(aspect))
-    
-    if (nextAspectIndex === -1) {
-      gameState.setupPhase.completed = true
-      gameState.setupPhase.currentAspect = null
-      logger.info('Setup phase completed')
-    } else {
-      currentAspect = aspects[nextAspectIndex]
-      gameState.setupPhase.currentAspect = currentAspect
-      logger.info(`Moving to next aspect: ${currentAspect}`)
-    }
-  }
-
-  logger.debug(`handleSetupPhase - Updated game state:`, JSON.stringify(gameState, null, 2))
-
-  return { gameState, narratorResponse }
-}
-
-async function handleMainGame(gameState: GameState, lastUserMessage: string, lastAIResponse: string): Promise<{ gameState: GameState; narratorResponse: string }> {
-  const { object: detectedAspects } = await generateObject({
-    model: LLM.DETECTOR.MODEL,
-    schema: DETECTOR_SCHEMA,
-    prompt: `Detect which aspects of the game need updating based on the following AI response and user message:
-
-AI response: ${lastAIResponse}
-
-User message: ${lastUserMessage}`,
-    maxTokens: LLM.DETECTOR.MAX_TOKENS,
-    temperature: LLM.DETECTOR.TEMP,
-  })
-
-  logger.debug('handleMainGame - detectedAspects:', detectedAspects)
-
-  const updatedAspects: GameAspect[] = []
-
-  for (const [aspect, needsUpdate] of Object.entries(detectedAspects)) {
-    if (needsUpdate && aspect in MANAGER_CONFIGS) {
-      const config = MANAGER_CONFIGS[aspect as GameAspect];
-      logger.debug(`Updating aspect: ${aspect}`)
-      const { object: result } = await generateObject({
-        model: LLM.DETECTOR.MODEL,
-        output: 'no-schema',
-        prompt: `${config.PROMPT}\n\nAI response: ${lastAIResponse}\n\nUser message: ${lastUserMessage}`,
-        maxTokens: LLM.DETECTOR.MAX_TOKENS,
-        temperature: LLM.DETECTOR.TEMP,
-      })
-
-      logger.debug(`Updated aspect ${aspect}:`, JSON.stringify(result, null, 2))
-      
-      gameState[aspect as GameAspect] = result as Record<string, any>
-      updatedAspects.push(aspect as GameAspect)
-    }
-  }
-
-  const narratorResponse = await mainGameNarrator(lastUserMessage, gameState, updatedAspects)
-
-  logger.debug('handleMainGame - Updated game state:', JSON.stringify(gameState, null, 2))
-
-  return { gameState, narratorResponse }
 }

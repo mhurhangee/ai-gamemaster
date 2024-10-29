@@ -1,99 +1,164 @@
+// constants.ts
+
 import { openai } from '@ai-sdk/openai'
-import { z } from 'zod'
+import { LanguageModelV1 } from 'ai'
+
+export type GameAspect = keyof typeof MANAGER_CONFIGS
 
 const BASEMODEL = openai('gpt-4o-mini')
 
-export const LLM = {
+type BaseLLMConfig = {
+  MODEL: LanguageModelV1;
+  SYSTEM: string;
+  PROMPT: string;
+  TEMP: number;
+  MAX_TOKENS: number;
+}
+
+type EnumLLMConfig = BaseLLMConfig & {
+  OUTPUT: 'enum';
+  ENUM: string[];
+}
+
+type StandardLLMConfig = BaseLLMConfig & {
+  OUTPUT?: 'no-schema' | 'object';
+}
+
+type LLMConfig = EnumLLMConfig | StandardLLMConfig;
+
+export const LLM: Record<string, LLMConfig> = {
   SETUP_NARRATOR: {
     MODEL: BASEMODEL,
-    SYSTEM: `You are an AI narrator guiding a player through the setup phase of an RPG. Your role is to help the player establish the game world, characters, and initial conditions. Follow these key instructions:
-
-    - Guide the player through setting up each aspect of the game world.
-    - Be patient and thorough, ensuring each aspect is fully explored before moving to the next.
-    - Provide options and suggestions based on what has been established so far.
-    - Only move to the next aspect or complete the setup when explicitly instructed.
-    - Encourage creativity and ask for clarification when needed.
-    - Summarize key decisions at the end of each aspect setup.`,
+    SYSTEM: `You are an AI narrator guiding a player through the setup phase of an RPG. Be adaptive and responsive to the player's input. If the player asks you to generate content or move on, do so without further prompting. Always be ready to progress the setup phase.`,
+    PROMPT: `
+      Current game state: {{gameState}}
+      User's last message: {{userMessage}}
+      Provide a narrative prompt that advances the story and setup. If the user asks to move on or generate content, do so immediately. Focus on one aspect at a time, but make it feel natural and story-driven.
+    `,
     TEMP: 0.7,
     MAX_TOKENS: 16384,
   },
   MAIN_GAME_NARRATOR: {
     MODEL: BASEMODEL,
-    SYSTEM: `You are an AI narrator for the main gameplay of an interactive story-based RPG. Your role is to guide the player through the game, describe scenes, characters, and events in a vivid and engaging manner. Follow these key instructions:
-
-    - Respond to user actions and choices by advancing the story in interesting ways.
-    - Incorporate updates to game aspects into your narrative, explaining how they affect the game world or player's options.
-    - Maintain consistency with previously established elements of the game world and characters.
-    - Be creative while maintaining a consistent tone throughout the narrative.
-    - Balance providing information with asking for user input to keep the interaction engaging and collaborative.
-    - If user input contradicts existing information, find creative ways to reconcile the differences or explain the changes in-world.
-    - Provide clear options or prompts for the player when appropriate, encouraging their active participation in shaping the story.`,
+    SYSTEM: `You are an AI narrator for the main gameplay of an interactive story-based RPG. Guide the player through the game, describe scenes, characters, and events vividly. Respond to user actions, maintain consistency, and encourage active participation in shaping the story.`,
+    PROMPT: `
+      Game state: {{gameState}}
+      Recent interaction:
+      AI: {{lastAIResponse}}
+      User: {{lastUserMessage}}
+      Updated aspects: {{updatedAspects}}
+      Provide an engaging narrative response that advances the story, incorporates the updated aspects, and prompts the user for their next action.
+    `,
     TEMP: 0.7,
     MAX_TOKENS: 16384,
   },
   DETECTOR: {
     MODEL: BASEMODEL,
-    SYSTEM: `You are an AI assistant that detects which aspects of a text-based RPG need updating based on the latest interaction. 
-    Analyze the AI response and user message to determine which game elements require attention.`,
-    TEMP: 0.2,
+    SYSTEM: `You are an AI assistant that detects which aspects of a text-based RPG need updating based on the latest interaction. Be sensitive to user instructions about moving on or generating content.`,
+    PROMPT: `
+      Analyze the following interaction and determine which game elements require attention:
+      AI response: {{lastAIResponse}}
+      User message: {{lastUserMessage}}
+      Current game state: {{gameState}}
+      
+      Select the aspects that need updating from the following list. If the user asks to move on or generate content, select the next incomplete aspect.
+    `,
+    TEMP: 0.1,
+    MAX_TOKENS: 16384,
+    OUTPUT: 'enum',
+    ENUM: [
+      'loreAndWorldbuilding',
+      'rulesAndMechanics',
+      'charactersAndParties',
+      'questsAndObjectives',
+      'inventoryAndResources',
+      'dialogueAndInteraction',
+      'environmentAndExploration',
+      'combatAndEncounters',
+      'progressionAndSkills',
+      'economyAndTrading',
+      'settingsAndOptions',
+      'moveToNext'
+    ]
+  },
+  ASPECT_UPDATER: {
+    MODEL: BASEMODEL,
+    SYSTEM: `You are an AI assistant that updates specific aspects of a text-based RPG based on the latest interaction. If the user asks you to generate content, do so creatively and comprehensively.`,
+    PROMPT: `
+      Update the {{aspect}} aspect of the game state based on the following interaction:
+      AI response: {{lastAIResponse}}
+      User message: {{lastUserMessage}}
+      Current aspect state: {{aspectState}}
+      
+      If the user asks to generate content or move on, create a comprehensive update for this aspect. Otherwise, update based on the user's input.
+      Provide a JSON object representing the updated state of this aspect.
+    `,
+    TEMP: 0.1,
+    MAX_TOKENS: 16384,
+  },
+  SETUP_COMPLETE_CHECKER: {
+    MODEL: BASEMODEL,
+    SYSTEM: `You are an AI assistant that determines if the game setup is complete. Respond with either 'true' or 'false'.`,
+    PROMPT: `
+      Analyze the following game state and determine if it's sufficiently complete to begin the main game adventure.
+      Game state: {{gameState}}
+      Consider the following aspects: {{aspects}}
+      
+      Respond with 'true' if the setup is complete (all necessary aspects have sufficient detail), or 'false' if more information is needed.
+    `,
+    TEMP: 0.1,
+    MAX_TOKENS: 16384,
+    OUTPUT: 'enum',
+    ENUM: ['true', 'false']
+  },
+  STORY_SEED_GENERATOR: {
+    MODEL: BASEMODEL,
+    SYSTEM: `You are an AI storyteller tasked with creating an engaging opening for an RPG adventure.`,
+    PROMPT: `
+      Based on the following game state, generate an engaging opening to the adventure that sets the scene and gives the player their initial goal or quest.
+      Game state: {{gameState}}
+      Provide a short, engaging narrative that kicks off the adventure.
+    `,
+    TEMP: 0.7,
     MAX_TOKENS: 16384,
   },
 }
 
-
 export const MANAGER_CONFIGS = {
   loreAndWorldbuilding: {
-    PROMPT: `Update the lore and world-building elements based on the recent interaction. Include worldHistory (string), cultures (array of strings), and factions (array of strings).`,
+    PROMPT: `Update the lore and worldbuilding information. Include details about the world's history, cultures, and major events.`,
   },
   rulesAndMechanics: {
-    PROMPT: `Update the rules and mechanics based on the recent interaction. Include coreMechanics (array of strings), combatRules (string), and skillSystem (string).`,
+    PROMPT: `Update the rules and mechanics information. Include details about game mechanics, combat systems, and any unique rules for this world.`,
   },
   charactersAndParties: {
-    PROMPT: `Update the characters and party information based on the recent interaction. Include partyMembers (array of objects with name, role, and attributes) and npcs (array of objects with name and role).`,
+    PROMPT: `Update the characters and parties information. Include details about the player's character, party members, and significant NPCs.`,
   },
   questsAndObjectives: {
-    PROMPT: `Update the quests and objectives based on the recent interaction. Include activeQuests (array of objects with name, description, and status) and completedQuests (array of strings).`,
+    PROMPT: `Update the quests and objectives information. Include current quests, long-term goals, and any changes to existing objectives.`,
   },
   inventoryAndResources: {
-    PROMPT: `Update the inventory and resources based on the recent interaction. Include items (array of objects with name, quantity, and type) and currency (number).`,
+    PROMPT: `Update the inventory and resources information. Include items acquired or lost, currency changes, and resource management details.`,
   },
   dialogueAndInteraction: {
-    PROMPT: `Update the dialogue and interaction information based on the recent interaction. Include recentDialogues (array of objects with speaker and content) and importantChoices (array of strings).`,
+    PROMPT: `Update the dialogue and interaction information. Include key conversations, character relationships, and interaction options.`,
   },
   environmentAndExploration: {
-    PROMPT: `Update the environment and exploration information based on the recent interaction. Include currentLocation (string), discoveredLocations (array of strings), and mapFeatures (array of strings).`,
+    PROMPT: `Update the environment and exploration information. Include details about locations visited, discoveries made, and environmental challenges.`,
   },
   combatAndEncounters: {
-    PROMPT: `Update the combat and encounters information based on the recent interaction. Include recentCombats (array of objects with enemies and outcome) and combatStats (object with totalVictories and totalDefeats).`,
+    PROMPT: `Update the combat and encounters information. Include details about recent battles, enemy types, and combat outcomes.`,
   },
   progressionAndSkills: {
-    PROMPT: `Update the progression and skills information based on the recent interaction. Include characterLevels (object with character names as keys and levels as values), unlockedSkills (array of strings), and experiencePoints (object with character names as keys and XP as values).`,
+    PROMPT: `Update the progression and skills information. Include character levels, unlocked skills, and experience points gained.`,
   },
   economyAndTrading: {
-    PROMPT: `Update the economy and trading information based on the recent interaction. Include playerWealth (number) and recentTransactions (array of objects with item, quantity, price, and type).`,
+    PROMPT: `Update the economy and trading information. Include details about transactions, market conditions, and economic factors in the game world.`,
   },
   settingsAndOptions: {
-    PROMPT: `Update the settings and options based on the recent interaction. Include difficulty (string: 'easy', 'normal', or 'hard'), audioSettings (object with musicVolume and sfxVolume), and displaySettings (object with brightness and contrast).`,
+    PROMPT: `Update the settings and options information. Include any changes to game settings, difficulty levels, or player preferences.`,
   },
 }
-
-export const DETECTOR_SCHEMA = z.object({
-  loreAndWorldbuilding: z.boolean(),
-  rulesAndMechanics: z.boolean(),
-  charactersAndParties: z.boolean(),
-  questsAndObjectives: z.boolean(),
-  inventoryAndResources: z.boolean(),
-  dialogueAndInteraction: z.boolean(),
-  environmentAndExploration: z.boolean(),
-  combatAndEncounters: z.boolean(),
-  progressionAndSkills: z.boolean(),
-  economyAndTrading: z.boolean(),
-  settingsAndOptions: z.boolean(),
-}).describe('Detected game aspects that need updating')
-
-export const DEFAULT_ENGINE = 'MAIN_GAME_NARRATOR'
-
-export type GameAspect = keyof typeof MANAGER_CONFIGS
 
 const formatAspectName = (name: string): string => {
   return name
@@ -103,7 +168,7 @@ const formatAspectName = (name: string): string => {
 }
 
 export const generateWelcomeMessage = (): string => {
-  let message = `Welcome to the AI-powered RPG! I'm your narrator and guide through this adventure. Before we begin, let's customize your game world. We'll go through each aspect of the game, and you can provide your preferences or ideas. Here are the aspects we'll cover:\n\n`
+  let message = `Welcome to the AI-powered RPG! I'm your narrator and guide through this adventure. Before we begin, let's customize your game world. We'll explore various aspects of the game, and you can provide your preferences or ideas. Here are the aspects we'll cover:\n\n`
 
   for (const key of Object.keys(MANAGER_CONFIGS)) {
     message += `- ${formatAspectName(key)}\n`
