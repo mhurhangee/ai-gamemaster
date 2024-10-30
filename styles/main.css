@@ -1,8 +1,586 @@
-@import './variables.css';
-@import './base.css';
-@import './layout.css';
-@import './components.css';
-@import './crt-effects.css';
-@import './text-effects.css';
-@import './terminal.css';
-@import './responsive.css';
+/* Imports */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Variables */
+:root {
+  --color-bg: #0a0a0a;
+  --color-text: #33ff33;
+  --color-primary: #33ff33;
+  --color-secondary: #00ffff; 
+  --color-emphasis: #ff33ff;
+  --border-width: 2px;
+  --crt-shadow-offset-x: 0.04rem;
+  --crt-shadow-offset-y: 0.08rem;
+  --crt-shadow-blur: 0.04rem;
+  --crt-flicker-opacity: 0.96;
+  --crt-flicker-duration: 0.2s;
+  --crt-phosphor-blur: 12px;
+}
+
+/* Base Styles */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 18px;
+}
+
+/* Layout */
+.eight-bit-layout {
+  max-width: 900px;
+  margin: 10px auto 0;
+  border: var(--border-width) solid var(--color-text);
+  padding: 30px;
+  box-shadow: 0 0 5px var(--color-text), 0 0 10px var(--color-text);
+  background-color: rgba(10, 10, 10, 0.8);
+  position: relative;
+  z-index: 1;
+}
+
+.eight-bit-header {
+  border-bottom: var(--border-width) solid var(--color-text);
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+.eight-bit-main {
+  margin-bottom: 30px;
+}
+
+.eight-bit-section {
+  border: var(--border-width) solid var(--color-primary);
+  padding: 30px;
+  margin-bottom: 30px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.eight-bit-footer {
+  border-top: var(--border-width) solid var(--color-text);
+  padding-top: 30px;
+  text-align: center;
+}
+
+/* Typography */
+.eight-bit-title {
+  font-size: 40px;
+  color: var(--color-emphasis);
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 4px 4px 0 var(--color-secondary);
+}
+
+.eight-bit-subtitle {
+  font-size: 32px;
+  color: var(--color-emphasis);
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 0 var(--color-secondary);
+}
+
+.eight-bit-text {
+  font-size: 18px;
+}
+
+/* Navigation */
+.eight-bit-nav {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Links */
+.eight-bit-link {
+  color: var(--color-secondary);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.eight-bit-link::before {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-secondary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.eight-bit-link:hover {
+  text-decoration: none;
+  color: var(--color-emphasis);
+}
+
+.eight-bit-link:hover::before {
+  transform: scaleX(1);
+}
+
+/* Buttons */
+.eight-bit-button {
+  background-color: var(--color-bg);
+  color: var(--color-secondary);
+  border: var(--border-width) solid var(--color-secondary);
+  padding: 15px 25px;
+  font-family: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 var(--color-emphasis);
+}
+
+.eight-bit-button:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-bg);
+  box-shadow: 0 0 15px var(--color-secondary);
+}
+
+/* Dropdown */
+.eb-dropdown-wrapper {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1010;
+}
+
+.eb-dropdown-button {
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 70px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eb-dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--color-bg);
+  border: 3px solid var(--color-text);
+  padding: 10px 0;
+  width: 320px;
+  font-size: 14px;
+  z-index: 1011;
+}
+
+.eb-dropdown-content > * {
+  display: block;
+  width: 290px;
+  padding: 8px 15px;
+  color: var(--color-text);
+  transition: all 0.3s ease;
+  text-align: left;
+  background: var(--color-bg);
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eb-dropdown-content > *:hover {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* Terminal */
+.terminal-container {
+  width: 1024px;
+  height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.terminal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-primary);
+  padding: 20px;
+}
+
+.terminal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.terminal-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.message {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.message-prompt {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.user-prompt {
+  color: var(--color-emphasis);
+}
+
+.assistant-prompt {
+  color: var(--color-primary);
+}
+
+.user-message {
+  color: var(--color-primary);
+}
+
+.assistant-message {
+  color: var(--color-emphasis);
+}
+
+.message-content {
+  line-height: 1.5;
+  flex: 1;
+}
+
+.terminal-input-container {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 10px;
+  border-top: 2px solid var(--color-primary);
+}
+
+.input-prompt {
+  color: var(--color-primary);
+  margin-right: 10px;
+}
+
+.terminal-input {
+  flex-grow: 1;
+  background-color: transparent;
+  border: none;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+  resize: none;
+  overflow-y: auto;
+  max-height: 150px;
+}
+
+.terminal-input:focus {
+  outline: none;
+}
+
+/* Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-bg);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 16px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-primary);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  box-shadow: inset 0 0 0 2px var(--color-bg);
+}
+
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* CRT Effects */
+.crt-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.crt-pixel,
+.crt-scanline,
+.crt-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.crt-pixel.active,
+.crt-scanline.active,
+.crt-vignette.active {
+  opacity: 1;
+}
+
+.crt-pixel {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.05),
+    rgba(0, 255, 0, 0.05),
+    rgba(0, 0, 255, 0.05)
+  );
+  background-size: 4px 4px;
+}
+
+.crt-scanline {
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 5px;
+  animation: scanline 100s linear infinite;
+}
+
+@keyframes scanline {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+.crt-vignette {
+  background: 
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0) 80%,
+      rgba(0, 0, 0, 0.3) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0) 15%,
+      rgba(0, 0, 0, 0) 85%,
+      rgba(0, 0, 0, 0.3) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0) 15%,
+      rgba(0, 0, 0, 0) 85%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+  border-radius: 20px;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.3);
+}
+
+/* Text Effects */
+.crt-text-shadow {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-emphasis);
+}
+
+.crt-text-shadow-primary {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary);
+}
+
+.crt-text-shadow-secondary {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-primary), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-secondary);
+}
+
+.crt-text-shadow-emphasis {
+  text-shadow: 
+    var(--crt-shadow-offset-x) 0 var(--crt-shadow-blur) var(--color-primary), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-emphasis);
+}
+
+@keyframes textFlicker {
+  0%, 100% { opacity: var(--crt-flicker-opacity); }
+  50% { opacity: 1; }
+}
+
+.crt-text-flicker {
+  animation: textFlicker var(--crt-flicker-duration) infinite;
+}
+
+.crt-phosphor .eight-bit-text,
+.crt-phosphor .eight-bit-subtitle,
+.crt-phosphor .eight-bit-title,
+.crt-phosphor .eight-bit-link {
+  filter: drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-shadow.crt-phosphor .eight-bit-text,
+.crt-text-shadow.crt-phosphor .eight-bit-subtitle,
+.crt-text-shadow.crt-phosphor .eight-bit-title,
+.crt-text-shadow.crt-phosphor .eight-bit-link {
+  text-shadow: 
+    var(--crt-shadow-offset-y) 0 var(--crt-shadow-blur) var(--color-emphasis), 
+    calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary),
+    0 0 var(--crt-phosphor-blur) currentColor;
+  filter: none;
+}
+
+.crt-icon {
+  fill: currentColor;
+  filter: drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-shadow .crt-icon {
+  filter: 
+    drop-shadow(var(--crt-shadow-offset-x) 0  var(--crt-shadow-blur) var(--color-secondary))
+    drop-shadow(calc(-1 * var(--crt-shadow-offset-y)) 0 var(--crt-shadow-blur) var(--color-primary))
+    drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
+}
+
+.crt-text-flicker .crt-icon {
+  animation: textFlicker var(--crt-flicker-duration) infinite;
+}
+
+/* Markdown Formatting */
+.markdown-content {
+  color: var(--color-text);
+}
+
+/* Remove top margin from the first element in markdown content */
+.markdown-content > *:first-child {
+  margin-top: 0;
+}
+
+/* Adjust paragraph margins */
+.markdown-content p {
+  margin: 0 0 10px 0;
+}
+
+/* Remove bottom margin from the last paragraph */
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content strong {
+  color: var(--color-secondary);
+}
+
+.markdown-content em {
+  color: var(--color-secondary);
+  font-style: italic;
+}
+
+.markdown-content ul, .markdown-content ol {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.markdown-content li {
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.markdown-content ul li::before {
+  content: '>';
+  color: var(--color-primary);
+  position: absolute;
+  left: -20px;
+}
+
+.markdown-content ol {
+  counter-reset: item;
+}
+
+.markdown-content ol li {
+  counter-increment: item;
+}
+
+.markdown-content ol li::before {
+  content: counter(item) ".";
+  color: var(--color-primary);
+  position: absolute;
+  left: -20px;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 2px dashed var(--color-secondary);
+  margin: 20px 0;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3, 
+.markdown-content h4, .markdown-content h5, .markdown-content h6 {
+  color: var(--color-emphasis);
+  margin-top: 30px;
+  margin-bottom: 15px;
+  text-shadow: 3px 3px 0 var(--color-bg);
+}
+
+.markdown-content h1 { font-size: 28px; }
+.markdown-content h2 { font-size: 24px; }
+.markdown-content h3 { font-size: 20px; }
+.markdown-content h4 { font-size: 18px; }
+.markdown-content h5 { font-size: 16px; }
+.markdown-content h6 { font-size: 14px; }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .terminal-container {
+    padding: 10px;
+  }
+
+  .terminal-header h2 {
+    font-size: 18px;
+  }
+
+  .terminal-scroll-area,
+  .terminal-input {
+    font-size: 12px;
+  }
+
+  .stop-button {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .eight-bit-layout {
+    padding: 15px;
+  }
+
+  .eight-bit-title {
+    font-size: 28px;
+  }
+
+  .eight-bit-subtitle {
+    font-size: 24px;
+  }
+
+  .eight-bit-text {
+    font-size: 14px;
+  }
+}

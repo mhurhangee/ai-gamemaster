@@ -1,5 +1,7 @@
 // constants.ts
 
+export const MESSAGE_HISTORY_LENGTH = 5
+
 import { openai } from '@ai-sdk/openai'
 import { LanguageModelV1 } from 'ai'
 

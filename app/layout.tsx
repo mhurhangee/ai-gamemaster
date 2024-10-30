@@ -1,6 +1,7 @@
 import React from 'react'
 import '@/styles/main.css'
 import { TerminalProvider } from '@/components/TerminalProvider'
+import { Terminal } from '@/components/Terminal'
 
 
 export const metadata = {
@@ -16,20 +17,18 @@ export const metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout() {
   return (
     <TerminalProvider>
-    <html lang="en">
-      <body >
-        <main className="min-h-screen bg-background">
-          {children}
-        </main>
-      </body>
-    </html>
+      <html lang="en">
+        <body >
+          <main className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-8">
+              <Terminal />
+            </div>
+          </main>
+        </body>
+      </html>
     </TerminalProvider>
   )
 }

@@ -1,6 +1,6 @@
 import { generateObject, generateText, CoreMessage } from 'ai'
 import { LLM } from './constants'
-import logger from './logger'
+import logger from './utils'
 
 type LLMKey = keyof typeof LLM
 

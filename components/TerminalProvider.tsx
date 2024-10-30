@@ -2,7 +2,7 @@
 
 'use client'
 
-import logger from '@/lib/logger'
+import logger from '@/lib/utils'
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react'
 import { GameState, Message, TerminalContextType } from '@/lib/types'
 import { generateWelcomeMessage } from '@/lib/constants'
