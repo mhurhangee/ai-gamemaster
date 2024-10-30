@@ -3,7 +3,59 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModelV1 } from 'ai'
 
-export type GameAspect = keyof typeof GAME_ASPECTS
+export type CoreAspect = 'genre' | 'styleAndTone' | 'theme' | 'moodAndMotifs' | 'moralsAndMainObjective'
+export type GameAspect = 'playerCharacterAndAttributes' | 'partyAndRelationships' | 'questsAndObjectives' | 'inventoryAndEquipment' | 'abilitiesAndMechanics' | 'factionsAndReputation'
+
+
+export const CORE_ASPECTS = {
+  genre: {
+    SETUP_PROMPT: `Let's start with the genre of your game. What broad category (e.g., Fantasy, Sci-Fi, Mystery) and subgenre (e.g., Cyberpunk, High Fantasy) would you like for your game?`,
+    UPDATE_PROMPT: `Update the genre information. Include details about the broad category and subgenre of the game.`,
+  },
+  styleAndTone: {
+    SETUP_PROMPT: `Now, let's define the style and tone of your game. What narrative and descriptive style, along with the emotional tone, would you like for your game (e.g., dark, heroic, whimsical)?`,
+    UPDATE_PROMPT: `Update the style and tone information. Include details about the narrative style and emotional tone of the game.`,
+  },
+  theme: {
+    SETUP_PROMPT: `Let's establish the core theme of your game. What ideas would you like your game to explore (e.g., power and corruption, redemption, survival)?`,
+    UPDATE_PROMPT: `Update the theme information. Include details about the core ideas and philosophical foundation of the game.`,
+  },
+  moodAndMotifs: {
+    SETUP_PROMPT: `Now, let's define the mood and motifs of your game. What emotional atmosphere and recurring symbols or patterns would you like in your game?`,
+    UPDATE_PROMPT: `Update the mood and motifs information. Include details about the emotional atmosphere and recurring symbols in the game.`,
+  },
+  moralsAndMainObjective: {
+    SETUP_PROMPT: `Finally for the core aspects, let's establish the morals and main objective of your game. What ethical framework and primary quest or mission would you like for your game?`,
+    UPDATE_PROMPT: `Update the morals and main objective information. Include details about the ethical framework and primary quest of the game.`,
+  },
+}
+
+export const GAME_ASPECTS = {
+  playerCharacterAndAttributes: {
+    SETUP_PROMPT: `Let's focus on the player character and attributes. Describe the main character, including attributes (e.g., Strength, Intelligence), skills, class, and background traits.`,
+    UPDATE_PROMPT: `Update the player character and attributes information. Include details about the main character's attributes, skills, class, and background.`,
+  },
+  partyAndRelationships: {
+    SETUP_PROMPT: `Now, let's outline the party and relationships. Describe potential companions and allies, and how relationships might evolve throughout the game.`,
+    UPDATE_PROMPT: `Update the party and relationships information. Include details about companions, allies, and evolving relationships.`,
+  },
+  questsAndObjectives: {
+    SETUP_PROMPT: `Let's define the quests and objectives. What are the primary and secondary quests? What are the potential rewards and branching outcomes?`,
+    UPDATE_PROMPT: `Update the quests and objectives information. Include details about primary and secondary quests, rewards, and potential outcomes.`,
+  },
+  inventoryAndEquipment: {
+    SETUP_PROMPT: `Now, let's consider inventory and equipment. What kinds of items, weapons, armor, and artifacts might be found in the game?`,
+    UPDATE_PROMPT: `Update the inventory and equipment information. Include details about items, weapons, armor, and special artifacts in the game.`,
+  },
+  abilitiesAndMechanics: {
+    SETUP_PROMPT: `Let's outline the abilities and mechanics. What are the core gameplay systems, including combat mechanics and resource management?`,
+    UPDATE_PROMPT: `Update the abilities and mechanics information. Include details about core gameplay systems, combat mechanics, and resource management.`,
+  },
+  factionsAndReputation: {
+    SETUP_PROMPT: `Finally, let's consider factions and reputation. What key groups exist in the game world, and how might the player's actions affect their standing with these groups?`,
+    UPDATE_PROMPT: `Update the factions and reputation information. Include details about key groups in the game world and how player actions affect reputation.`,
+  },
+}
 
 const BASEMODEL = openai('gpt-4o-mini')
 
@@ -29,9 +81,8 @@ type LLMConfig = EnumLLMConfig | StandardLLMConfig;
 export const LLM: Record<string, LLMConfig> = {
   SETUP_NARRATOR: {
     MODEL: BASEMODEL,
-    SYSTEM: `You are an AI guiding a player through the setup phase of a text-based RPG. Focus on gathering essential information about the RPG such as game world and characters. Make the setup phase dynamic and interesting without starting the actual adventure.`,
+    SYSTEM: `You are an AI guiding a player through the setup phase of a text-based RPG. Focus on gathering essential information about the RPG such as core aspects and game aspects. Make the setup phase dynamic and interesting without starting the actual adventure.`,
     PROMPT: `
-
       # CONTEXT FOR RESPONSE
       Using the current game state, and latest interaction between the user and the AI, progress the setup of the text-based RPG.
 
@@ -50,13 +101,13 @@ export const LLM: Record<string, LLMConfig> = {
       {{userMessage}}
       """
       
-      ## Current game aspect to setup
+      ## Current aspect to setup
       """ 
       {{currentAspect}}
       """
 
       # INSTRUCTIONS FOR RESPONSE
-      Provide a message that prompts the User to provide information for the current game aspect.  You may include illustrative examples and suggestions to assist the user.
+      Provide a message that prompts the User to provide information for the current aspect. You may include illustrative examples and suggestions to assist the user. Remember to focus on Core Aspects first, then move on to Game Aspects.
     `,
     TEMP: 0.7,
     MAX_TOKENS: 16384,
@@ -114,7 +165,7 @@ export const LLM: Record<string, LLMConfig> = {
 
       ## User message 
       """
-      {{lastUserMessage}}
+      {{userMessage}}
       """
 
       ## Current game state
@@ -122,16 +173,22 @@ export const LLM: Record<string, LLMConfig> = {
       {{gameState}}
       """
 
+      ## Is Setup Phase
+      """
+      {{isSetupPhase}}
+      """
+
       # INSTRUCTIONS FOR RESPONSE
-      Select the aspects that need updating from the following list.
+      If isSetupPhase is true, select the aspect that needs updating from both CORE_ASPECTS and GAME_ASPECTS.
+      If isSetupPhase is false, select the aspect that needs updating only from GAME_ASPECTS.
+      If no aspect needs updating or if moving to the next aspect is appropriate, return 'moveToNext'.
     `,
     TEMP: 0.1,
     MAX_TOKENS: 16384,
     OUTPUT: 'enum',
     ENUM: [
-      'worldAndLore',
-      'charactersAndMechanics',
-      'questsAndProgression',
+      ...Object.keys(CORE_ASPECTS),
+      ...Object.keys(GAME_ASPECTS),
       'moveToNext'
     ]
   },
@@ -165,32 +222,39 @@ export const LLM: Record<string, LLMConfig> = {
   },
   SETUP_COMPLETE_CHECKER: {
     MODEL: BASEMODEL,
-    SYSTEM: `You are an AI assistant that determines if the game setup is complete. Respond with either 'true' or 'false'.`,
+    SYSTEM: `You are an AI assistant that determines if the game setup is complete for a text-based RPG. Your role is crucial in transitioning from the setup phase to the main game. Respond with either 'true' or 'false'.`,
     PROMPT: `
       # CONTEXT FOR RESPONSE
-      Analyze the following game state, and the AI and User's messages and determine if it's sufficiently complete to begin the main game adventure.
+      Analyze the following game state, the last AI response, and the last user message to determine if the setup is sufficiently complete to begin the main game adventure.
 
       ## Game state
       """
       {{gameState}}
       """
 
-      ## AI response
+      ## Last AI response
       """
       {{lastAIResponse}}
       """
       
-      ## User message
+      ## Last user message
       """
-      {{lastUserMessage}}
+      {{userMessage}}
       """
 
-      ## Consider the following aspects
-      """
-      {{aspects}}
-      """
+      ## Required aspects for a complete setup
+      1. World and Lore: The game world should have a defined setting, major historical events, and unique elements.
+      2. Characters and Mechanics: There should be information about the main character(s), important NPCs, and core gameplay systems.
+      3. Quests and Progression: The game should have outlined main quests or objectives and a basic progression system.
 
       # INSTRUCTIONS FOR RESPONSE
+      Evaluate if all required aspects have sufficient detail to start the main game. Consider the following:
+      - Is there enough information about the world and its lore in the game state?
+      - Are the main characters and core game mechanics defined in the game state?
+      - Is there at least one clear quest or objective for the player to pursue in the game state?
+      - Does the last AI response indicate that all necessary setup information has been gathered?
+      - Does the last user message suggest that they are ready to begin the main game or that they have provided all necessary setup information?
+
       Respond with 'true' if the setup is complete (all necessary aspects have sufficient detail), or 'false' if more information is needed.
     `,
     TEMP: 0.1,
@@ -237,29 +301,22 @@ export const LLM: Record<string, LLMConfig> = {
   },
 }
 
-export const GAME_ASPECTS = {
-  worldAndLore: {
-    SETUP_PROMPT: `Let's establish the world and lore of your game. Describe the setting, major historical events, cultures, and any unique elements of this world.`,
-    UPDATE_PROMPT: `Update the world and lore information. Include details about the world's history, cultures, and major events.`,
-  },
-  charactersAndMechanics: {
-    SETUP_PROMPT: `Now, let's focus on characters and game mechanics. Describe the main character(s), important NPCs, and the core gameplay systems (e.g., magic, combat, skills).`,
-    UPDATE_PROMPT: `Update the characters and mechanics information. Include details about player characters, NPCs, and game systems.`,
-  },
-  questsAndProgression: {
-    SETUP_PROMPT: `Finally, let's outline the main quests and progression system. What are the primary objectives? How do characters grow and develop over time?`,
-    UPDATE_PROMPT: `Update the quests and progression information. Include current quests, long-term goals, and character advancement details.`,
-  },
-}
+
 
 export const generateWelcomeMessage = (): string => {
-  let message = `Welcome to the AI-powered RPG! I'm your narrator and guide through this adventure. Before we begin, let's customize your game world. We'll explore various aspects of the game, and you can provide your preferences or ideas. Here are the aspects we'll cover:\n\n`
+  let message = `Welcome to the AI-powered RPG! I'm your narrator and guide through this adventure. Before we begin, let's customize your game world. We'll explore various aspects of the game, starting with Core Aspects and then moving on to Game Aspects. Here are the aspects we'll cover:\n\n`
 
-  for (const [key, value] of Object.entries(GAME_ASPECTS)) {
+  message += `Core Aspects:\n`
+  for (const key of Object.keys(CORE_ASPECTS)) {
     message += `- ${key.split(/(?=[A-Z])/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}\n`
   }
 
-  message += `\nLet's start with World and Lore. ${GAME_ASPECTS.worldAndLore.SETUP_PROMPT}`
+  message += `\nGame Aspects:\n`
+  for (const key of Object.keys(GAME_ASPECTS)) {
+    message += `- ${key.split(/(?=[A-Z])/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}\n`
+  }
+
+  message += `\nLet's start with the genre. ${CORE_ASPECTS.genre.SETUP_PROMPT}`
 
   return message
 }

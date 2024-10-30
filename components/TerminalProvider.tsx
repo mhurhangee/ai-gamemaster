@@ -15,9 +15,21 @@ export const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [gameState, setGameState] = useState<GameState>({
-    worldAndLore: {},
-    charactersAndMechanics: {},
-    questsAndProgression: {},
+    coreAspects: {
+      genre: '',
+      styleAndTone: '',
+      theme: '',
+      moodAndMotifs: '',
+      moralsAndMainObjective: ''
+    },
+    gameAspects: {
+      playerCharacterAndAttributes: {},
+      partyAndRelationships: {},
+      questsAndObjectives: {},
+      inventoryAndEquipment: {},
+      abilitiesAndMechanics: {},
+      factionsAndReputation: {}
+    },
     setupPhase: {
       completed: false,
       currentAspect: null,

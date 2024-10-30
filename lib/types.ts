@@ -1,6 +1,6 @@
 // types.ts
 
-import { GameAspect } from './constants'
+import { CoreAspect, GameAspect } from './constants'
 
 export interface Message {
   role: 'user' | 'assistant' | 'system'
@@ -18,14 +18,30 @@ export interface TerminalContextType {
   isSetupPhase: boolean
 }
 
+export interface CoreAspects {
+  genre: string
+  styleAndTone: string
+  theme: string
+  moodAndMotifs: string
+  moralsAndMainObjective: string
+}
+
+export interface GameAspects {
+  playerCharacterAndAttributes: Record<string, any>
+  partyAndRelationships: Record<string, any>
+  questsAndObjectives: Record<string, any>
+  inventoryAndEquipment: Record<string, any>
+  abilitiesAndMechanics: Record<string, any>
+  factionsAndReputation: Record<string, any>
+}
+
 export interface GameState {
-  worldAndLore: Record<string, any>
-  charactersAndMechanics: Record<string, any>
-  questsAndProgression: Record<string, any>
+  coreAspects: CoreAspects
+  gameAspects: GameAspects
   setupPhase: {
     completed: boolean
-    currentAspect: GameAspect | null
-    aspectsCompleted: GameAspect[]
+    currentAspect: CoreAspect | GameAspect | null
+    aspectsCompleted: (CoreAspect | GameAspect)[]
   }
 }
 
