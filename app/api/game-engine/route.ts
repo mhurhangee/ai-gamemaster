@@ -29,7 +29,13 @@ export async function POST(req: NextRequest) {
     ({ gameState: updatedGameState, narratorResponse } = await handleMainGame(gameState, recentMessages))
   }
 
-  return Response.json({ narratorResponse, gameState: updatedGameState })
+  // Generate ASCII art
+  //const asciiArt = await generateASCIIArt(narratorResponse)
+
+  // Combine narrator response with ASCII art
+  const combinedResponse = `${narratorResponse}`//\n\n\`\`\`\n${asciiArt}\n\`\`\``
+
+  return Response.json({ narratorResponse: combinedResponse, gameState: updatedGameState })
 }
 
 // Helper functions
@@ -126,6 +132,19 @@ async function handleMainGame(gameState: GameState, recentMessages: CoreMessage[
   const narratorResponse = await generateAI('MAIN_GAME_NARRATOR', { gameState }, recentMessages) as string
 
   return { gameState, narratorResponse }
+}
+
+async function generateASCIIArt(sceneDescription: string): Promise<string> {
+  try {
+    const asciiArt = await generateAI('ASCII_ART_GENERATOR', { 
+      sceneDescription 
+    }, []) as string;
+    
+    return asciiArt.trim();
+  } catch (error) {
+    console.error('Failed to generate ASCII art:', error);
+    return ''; // Return empty string if generation fails
+  }
 }
 
 function initializeGameState(previousGameState: Partial<GameState>): GameState {

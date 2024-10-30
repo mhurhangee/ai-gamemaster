@@ -5,10 +5,22 @@ import ReactMarkdown from 'react-markdown'
 import { useTerminal } from './TerminalProvider'
 import CRTEffect from "./CRTEffect"
 
+// ASCII Art component
+const ASCIIArt: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <pre className="ascii-art">
+    <code>{children}</code>
+  </pre>
+)
+
 // MarkdownRenderer component
 const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
   return (
-    <ReactMarkdown className="markdown-content">
+    <ReactMarkdown
+      className="markdown-content"
+      components={{
+        code: ({ children }) => <ASCIIArt>{children}</ASCIIArt>
+      }}
+    >
       {content}
     </ReactMarkdown>
   )

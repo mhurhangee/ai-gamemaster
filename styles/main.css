@@ -548,6 +548,20 @@ body, html {
 .markdown-content h5 { font-size: 16px; }
 .markdown-content h6 { font-size: 14px; }
 
+/* ASCII Art Styles */
+.ascii-art {
+  font-family: monospace;
+  white-space: pre;
+  font-size: 12px;
+  line-height: 1.2;
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+  padding: 10px;
+  border: 1px solid var(--color-secondary);
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .terminal-container {

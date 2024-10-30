@@ -48,4 +48,5 @@ export interface GameState {
 export interface NarratorResponse {
   gameState: GameState
   narratorResponse: string
+  asciiArt?: string
 }

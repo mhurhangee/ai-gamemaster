@@ -301,6 +301,30 @@ export const LLM: Record<string, LLMConfig> = {
     TEMP: 0.1,
     MAX_TOKENS: 16384,
   },
+  ASCII_ART_GENERATOR: {
+    MODEL: BASEMODEL,
+    SYSTEM: `You are an AI that generates ASCII art based on scene descriptions. Create visually appealing and relevant ASCII art that fits within a 40x20 character grid.`,
+    PROMPT: `
+      # CONTEXT FOR RESPONSE
+      Create an ASCII art representation of the following scene description that captures the key visual elements while maintaining readability and artistic appeal.
+
+      ## Scene Description
+      """
+      {{sceneDescription}}
+      """
+
+      # INSTRUCTIONS FOR RESPONSE
+      1. Use only ASCII characters to create the art
+      2. Keep the width at 40 characters or less
+      3. Keep the height at 20 lines or less
+      4. Focus on key visual elements from the scene
+      5. Ensure the art is clear and recognizable
+      6. Use appropriate shading and depth techniques
+      7. Return ONLY the ASCII art without any additional text or explanation
+    `,
+    TEMP: 0.7,
+    MAX_TOKENS: 16384,
+  },
 }
 
 
