@@ -19,11 +19,11 @@ interface CRTEffectProps {
 
 export default function CRTEffect({ children }: CRTEffectProps) {
   const [effects, setEffects] = useState<EffectState>({
-    pixel: false,
-    scanline: false,
-    vignette: false,
+    pixel: true,
+    scanline: true,
+    vignette: true,
     textShadow: false,
-    textFlicker: false,
+    textFlicker: true,
     phosphor: false,
   })
 

@@ -14,7 +14,7 @@
   --crt-shadow-blur: 0.04rem;
   --crt-flicker-opacity: 0.96;
   --crt-flicker-duration: 0.2s;
-  --crt-phosphor-blur: 12px;
+  --crt-phosphor-blur: 6px;
 }
 
 /* Base Styles */
@@ -270,7 +270,7 @@ body, html {
 }
 
 .input-prompt {
-  color: var(--color-primary);
+  color: var(--color-emphasis);
   margin-right: 10px;
 }
 
@@ -278,7 +278,7 @@ body, html {
   flex-grow: 1;
   background-color: transparent;
   border: none;
-  color: var(--color-text);
+  color: var(--color-emphasis);
   font-family: inherit;
   font-size: inherit;
   padding: 0;
@@ -435,7 +435,8 @@ body, html {
 .crt-phosphor .eight-bit-text,
 .crt-phosphor .eight-bit-subtitle,
 .crt-phosphor .eight-bit-title,
-.crt-phosphor .eight-bit-link {
+.crt-phosphor .eight-bit-link,
+.crt-phosphor .message-content {
   filter: drop-shadow(0 0 var(--crt-phosphor-blur) currentColor);
 }
 
