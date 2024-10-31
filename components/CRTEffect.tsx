@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 import { EBButton } from "./EBButton"
 import { EBDropdown, EBDropdownTrigger, EBDropdownContent, EBDropdownItem, EBDropdownSeparator } from "./EBDropdown"
 
@@ -20,11 +19,11 @@ interface CRTEffectProps {
 
 export default function CRTEffect({ children }: CRTEffectProps) {
   const [effects, setEffects] = useState<EffectState>({
-    pixel: false,
-    scanline: false,
-    vignette: false,
+    pixel: true,
+    scanline: true,
+    vignette: true,
     textShadow: false,
-    textFlicker: false,
+    textFlicker: true,
     phosphor: false,
   })
 
