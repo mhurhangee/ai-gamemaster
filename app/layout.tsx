@@ -1,8 +1,6 @@
 import React from 'react'
 import '@/styles/main.css'
 import { TerminalProvider } from '@/components/TerminalProvider'
-import { Terminal } from '@/components/Terminal'
-
 
 export const metadata = {
   title: 'AI RPG GameMaster',
@@ -17,14 +15,14 @@ export const metadata = {
   },
 }
 
-export default function RootLayout() {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <TerminalProvider>
       <html lang="en">
-        <body >
+        <body>
           <main className="min-h-screen bg-background">
             <div className="container mx-auto px-4 py-8">
-              <Terminal />
+              {children}
             </div>
           </main>
         </body>
